@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ''
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  CallbackURLs:
+    Type: String
+
+Resources:
+  Route53:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./route53.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+
+  CognitoUserPool:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./cognito.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        CallbackURLs: !Ref CallbackURLs
+        DomainName: !Ref DomainName
+        CertificateArn: !GetAtt [Route53, Outputs.Certificate]

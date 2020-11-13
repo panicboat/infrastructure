@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ''
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+
+Resources:
+  # Route53:
+  #   Type: AWS::Route53::RecordSet
+  #   Properties:
+  #     AliasTarget:
+  #     HostedZoneId: !Ref HostedZoneId
+  #     Name: !Ref DomainName
+  #     Type: A
+  #     TTL: 900
+
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+        - DomainName: !Sub www.${DomainName}
+          HostedZoneId: !Ref HostedZoneId
+      SubjectAlternativeNames:
+        - !Sub www.${DomainName}
+      ValidationMethod: DNS
+
+  # This resource must be created with us-east-1
+  CertificateAuth:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub auth.${DomainName}
+      DomainValidationOptions:
+        - DomainName: !Sub auth.${DomainName}
+          HostedZoneId: !Ref HostedZoneId
+      ValidationMethod: DNS
+
+  CertificateWildcard:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub '*.${DomainName}'
+      DomainValidationOptions:
+        - DomainName: !Sub '*.${DomainName}'
+          HostedZoneId: !Ref HostedZoneId
+      ValidationMethod: DNS
+
+Outputs:
+  Certificate:
+    Value: !Ref Certificate

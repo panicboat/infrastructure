@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ''
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  CallbackURLs:
+    Type: CommaDelimitedList
+  DomainName:
+    Type: String
+  CertificateArn:
+    Type: String
+
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${ProductName}-users
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      AliasAttributes:
+        - email
+        # - phone_number
+        # - preferred_username
+      AutoVerifiedAttributes:
+        - email
+        # - phone_number
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: true
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          DeveloperOnlyAttribute: false
+          Mutable: true
+          Required: true
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      # CustomDomainConfig:
+      #   CertificateArn: !Ref CertificateArn
+      # Domain: !Sub auth.${DomainName}
+      Domain: !Ref ProductName
+      UserPoolId: !Ref UserPool
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        # - phone
+        - email
+        - openid
+        # - aws.cognito.signin.user.admin
+        - profile
+      ClientName: !Sub ${ProductName}-users
+      CallbackURLs: !Ref CallbackURLs
+      ExplicitAuthFlows:
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      RefreshTokenValidity: 7
+      UserPoolId: !Ref UserPool
