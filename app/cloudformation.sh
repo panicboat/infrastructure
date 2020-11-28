@@ -57,11 +57,10 @@ fi
 # ------------------------------------------------------------------------------------------------------
 # Parameters
 # ------------------------------------------------------------------------------------------------------
-json=$SCRIPT_DIR/$project/$env/$template.json
-params=`cat $json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
-product=`cat $json | jq -r '.ProductName'`
-project=`cat $json | jq -r '.ProjectName'`
 networks=`cat $SCRIPT_DIR/../resources/$env/networks.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
+params=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
+product=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '.ProductName'`
+project=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '.ProjectName'`
 
 # ------------------------------------------------------------------------------------------------------
 # Package
