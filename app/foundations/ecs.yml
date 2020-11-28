@@ -1,0 +1,13 @@
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: ''
+
+Parameters:
+  ProductName:
+    Type: String
+
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ProductName

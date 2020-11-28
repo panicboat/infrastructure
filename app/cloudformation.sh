@@ -1,10 +1,9 @@
 #!/bin/bash -eu
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
-cd $SCRIPT_DIR
 
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 # Input Option
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 while [ $# -gt 0 ];
 do
     case ${1} in
@@ -55,17 +54,18 @@ if [ -z "$template" ] || [ ! -f "$SCRIPT_DIR/$project/$env/$template.json" ]; th
     done
 fi
 
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 # Parameters
-#------------------------------------------------------------------------------------------------------
-params_json=$SCRIPT_DIR/$project/$env/$template.json
-params=`cat $params_json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
-product=`cat $params_json | jq -r '.ProductName'`
-project=`cat $params_json | jq -r '.ProjectName'`
+# ------------------------------------------------------------------------------------------------------
+json=$SCRIPT_DIR/$project/$env/$template.json
+params=`cat $json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
+product=`cat $json | jq -r '.ProductName'`
+project=`cat $json | jq -r '.ProjectName'`
+networks=`cat $SCRIPT_DIR/../resources/$env/networks.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
 
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 # Package
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 s3_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$product':ArtifactBucket")) | .Value'`
 aws cloudformation package \
     --template-file $SCRIPT_DIR/$project/cfn-stack-$template.yml \
@@ -76,13 +76,14 @@ if [ $? -ne 0 ]; then
     exit $?
 fi
 
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 # Deploy
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 aws cloudformation deploy \
     --template-file $SCRIPT_DIR/$project/$env/.cfn-stack-$template.yml \
     --stack-name $product-$project \
-    --parameter-overrides $params
+    --parameter-overrides $params $networks \
+    --capabilities CAPABILITY_NAMED_IAM
 if [ $? -ne 0 ]; then
     exit $?
 fi

@@ -1,11 +1,11 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: ''
 
 Parameters:
   ProductName:
     Type: String
-  ProjectName:
-    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
   DomainName:
     Type: String
   HostedZoneId:
@@ -20,7 +20,6 @@ Resources:
       TemplateURL: ./route53.yml
       Parameters:
         ProductName: !Ref ProductName
-        ProjectName: !Ref ProjectName
         DomainName: !Ref DomainName
         HostedZoneId: !Ref HostedZoneId
 
@@ -30,7 +29,28 @@ Resources:
       TemplateURL: ./cognito.yml
       Parameters:
         ProductName: !Ref ProductName
-        ProjectName: !Ref ProjectName
         CallbackURLs: !Ref CallbackURLs
         DomainName: !Ref DomainName
         CertificateArn: !GetAtt [Route53, Outputs.Certificate]
+
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./iam.yml
+      Parameters:
+        ProductName: !Ref ProductName
+
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./vpc.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        VpcId: !Ref VpcId
+
+  ElasticContainerService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./ecs.yml
+      Parameters:
+        ProductName: !Ref ProductName

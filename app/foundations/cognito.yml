@@ -1,10 +1,8 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: ''
 
 Parameters:
   ProductName:
-    Type: String
-  ProjectName:
     Type: String
   CallbackURLs:
     Type: CommaDelimitedList
@@ -73,3 +71,9 @@ Resources:
       PreventUserExistenceErrors: ENABLED
       RefreshTokenValidity: 7
       UserPoolId: !Ref UserPool
+
+Outputs:
+  UserPool:
+    Value: !Ref UserPool
+    Export:
+          Name: !Join [':', [!Ref ProductName, UserPool]]

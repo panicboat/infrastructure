@@ -1,15 +1,13 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: ''
 
 Parameters:
   ProductName:
     Type: String
-  ProjectName:
-    Type: String
   DomainName:
     Type: String
   HostedZoneId:
-    Type: String
+    Type: AWS::Route53::HostedZone::Id
 
 Resources:
   # Route53:
@@ -32,16 +30,6 @@ Resources:
           HostedZoneId: !Ref HostedZoneId
       SubjectAlternativeNames:
         - !Sub www.${DomainName}
-      ValidationMethod: DNS
-
-  # This resource must be created with us-east-1
-  CertificateAuth:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: !Sub auth.${DomainName}
-      DomainValidationOptions:
-        - DomainName: !Sub auth.${DomainName}
-          HostedZoneId: !Ref HostedZoneId
       ValidationMethod: DNS
 
   CertificateWildcard:
