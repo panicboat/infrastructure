@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  ContainerPort:
+    Type: Number
+  ServicesDomain:
+    Type: String
+
+Resources:
+  VirtualService:
+    Type: AWS::AppMesh::VirtualService
+    Properties:
+      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+      VirtualServiceName: !Sub "${ProductName}.${ServicesDomain}"
+      Spec:
+        Provider:
+          VirtualRouter:
+            VirtualRouterName: !GetAtt VirtualRouter.VirtualRouterName
+
+  VirtualRouter:
+    Type: AWS::AppMesh::VirtualRouter
+    Properties:
+      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+      VirtualRouterName: !Ref ProductName
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: !Ref ContainerPort
+              Protocol: http
+
+  Route:
+    Type: AWS::AppMesh::Route
+    Properties:
+      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+      VirtualRouterName: !GetAtt VirtualRouter.VirtualRouterName
+      RouteName: !Ref ProductName
+      Spec:
+        HttpRoute:
+          Action:
+            WeightedTargets:
+              - VirtualNode: !GetAtt VirtualNode.VirtualNodeName
+                Weight: 1
+          Match:
+            Prefix: /
+
+  VirtualNode:
+    Type: AWS::AppMesh::VirtualNode
+    Properties:
+      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+      VirtualNodeName: !Ref ProductName
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: !Ref ContainerPort
+              Protocol: http
+            HealthCheck:
+              Protocol: http
+              Path: /health
+              HealthyThreshold: 2
+              UnhealthyThreshold: 2
+              TimeoutMillis: 2000
+              IntervalMillis: 5000
+        ServiceDiscovery:
+          DNS:
+            Hostname: !Sub "${ProductName}.${ServicesDomain}"

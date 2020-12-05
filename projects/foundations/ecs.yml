@@ -32,6 +32,6 @@ Outputs:
       Name: !Sub ${ProductName}:ClusterArn
 
   ServiceMesh:
-    Value: !Ref ServiceMesh
+    Value: !GetAtt ServiceMesh.MeshName
     Export:
       Name: !Sub ${ProductName}:ServiceMesh
