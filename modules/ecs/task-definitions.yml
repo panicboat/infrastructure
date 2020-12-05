@@ -9,9 +9,9 @@ Parameters:
     Type: String
   ContainerPort:
     Type: Number
-  Cpu:
+  TaskCpu:
     Type: Number
-  Memory:
+  TaskMemory:
     Type: Number
   EcsTaskExecutionRoleArn:
     Type: String
@@ -29,8 +29,8 @@ Resources:
       Family: !Ref ProjectName
       RequiresCompatibilities:
         - FARGATE
-      Cpu: !Ref Cpu
-      Memory: !Ref Memory
+      Cpu: !Ref TaskCpu
+      Memory: !Ref TaskMemory
       NetworkMode: awsvpc
       ExecutionRoleArn: !Ref EcsTaskExecutionRoleArn
       TaskRoleArn: !Ref EcsTaskRoleArn
@@ -41,9 +41,7 @@ Resources:
             - ContainerPort: !Ref ContainerPort
               HostPort: !Ref ContainerPort
               Protocol: tcp
-          EntryPoint:
-            - sh
-            - -c
+          EntryPoint: [sh, -c]
           Environment:
             - Name: TZ
               Value: Asia/Tokyo

@@ -73,6 +73,7 @@ Outputs:
     Value: !Ref HttpListener
     Export:
       Name: !Sub ${ProductName}:HttpListenerArn
+
   HttpsListenerArn:
     Value: !Ref HttpsListener
     Export:

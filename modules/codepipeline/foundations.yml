@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  SlackWorkspaceId:
+    Type: String
+  SlackChannelId:
+    Type: String
+
+Resources:
+  SlackChannelConfiguration:
+    Type: AWS::Chatbot::SlackChannelConfiguration
+    Properties:
+      ConfigurationName: !Sub ${ProjectName}-chatbot
+      IamRoleArn: { 'Fn::ImportValue': !Sub "${ProductName}:ChatbotRoleArn" }
+      LoggingLevel: ERROR
+      SlackChannelId: !Ref SlackChannelId
+      SlackWorkspaceId: !Ref SlackWorkspaceId
+
+Outputs:
+  SlackChannelConfiguration:
+    Value: !Ref SlackChannelConfiguration

@@ -86,5 +86,6 @@ Resources:
 Outputs:
   EcsTaskExecutionRole:
     Value: !GetAtt EcsTaskExecutionRole.Arn
-  EcsTaskExecutionRole:
-    Value: !GetAtt EcsTaskExecutionRole.Arn
+
+  EcsTaskRoleArn:
+    Value: !GetAtt EcsTaskRole.Arn

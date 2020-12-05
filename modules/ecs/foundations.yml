@@ -7,15 +7,6 @@ Parameters:
     Type: String
 
 Resources:
-  SlackChannelConfiguration:
-    Type: AWS::Chatbot::SlackChannelConfiguration
-    Properties:
-      ConfigurationName: !Sub ${ProjectName}-chatbot
-      IamRoleArn: { 'Fn::ImportValue': !Sub "${ProductName}:ChatbotRoleArn" }
-      LoggingLevel: ERROR
-      SlackChannelId: !Ref SlackChannelId
-      SlackWorkspaceId: !Ref SlackWorkspaceId
-
   Repository:
     Type: AWS::ECR::Repository
     Properties:
@@ -29,5 +20,6 @@ Resources:
 Outputs:
   RepositoryURI:
     Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}"
+
   LogGroup:
     Value: !Ref LogGroup

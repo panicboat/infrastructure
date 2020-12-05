@@ -46,5 +46,6 @@ Outputs:
     Value: !Ref SecurityGroup
     Export:
       Name: !Sub ${ProductName}:SecurityGroup
+
   AllowGlobalTrafficSg:
     Value: !Ref AllowGlobalTrafficSg

@@ -1,0 +1,9 @@
+{
+    "ProductName": "panicboat",
+    "ProjectName": "api-iam",
+    "AllowEcsPolicy": "s3:*",
+    "ContainerName": "app",
+    "ContainerPort": 80,
+    "TaskCpu": 256,
+    "TaskMemory": 512
+}

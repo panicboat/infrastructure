@@ -80,7 +80,7 @@ fi
 # ------------------------------------------------------------------------------------------------------
 aws cloudformation deploy \
     --template-file $SCRIPT_DIR/$project/$env/.cfn-stack-$template.yml \
-    --stack-name $product-$project \
+    --stack-name $product-$project-$template \
     --parameter-overrides $params $networks \
     --capabilities CAPABILITY_NAMED_IAM
 if [ $? -ne 0 ]; then

@@ -1,1 +1,51 @@
 AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  AllowEcsPolicy:
+    Type: CommaDelimitedList
+  ContainerName:
+    Type: String
+  ContainerPort:
+    Type: Number
+  TaskCpu:
+    Type: Number
+  TaskMemory:
+    Type: Number
+
+Resources:
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/ecs/iam.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        AllowEcsPolicy: !Join [',', !Ref AllowEcsPolicy]
+
+  Foundations:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/ecs/foundations.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+
+  TaskDefinitions:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/ecs/task-definitions.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        ContainerName: !Ref ContainerName
+        ContainerPort: !Ref ContainerPort
+        TaskCpu: !Ref TaskCpu
+        TaskMemory: !Ref TaskMemory
+        EcsTaskExecutionRoleArn: !GetAtt [IAM, Outputs.EcsTaskExecutionRole]
+        EcsTaskRoleArn: !GetAtt [IAM, Outputs.EcsTaskRoleArn]
+        RepositoryURI: !GetAtt [Foundations, Outputs.RepositoryURI]
+        LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
