@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PublicSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  CallbackURLs:
+    Type: String
+
+Resources:
+  Route53:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./route53.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+
+  CognitoUserPool:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./cognito.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        CallbackURLs: !Ref CallbackURLs
+        DomainName: !Ref DomainName
+        CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
+
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./iam.yml
+      Parameters:
+        ProductName: !Ref ProductName
+
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./vpc.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        VpcId: !Ref VpcId
+
+  ElasticLoadBalancer:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./elb.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        HostedZoneId: !Ref HostedZoneId
+        DomainName: !Ref DomainName
+        PublicSubnets: !Join [',', !Ref PublicSubnets]
+        CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
+        SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup], !GetAtt [VPC, Outputs.AllowGlobalTrafficSg]]]
+
+  ElasticContainerService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./ecs.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        VpcId: !Ref VpcId

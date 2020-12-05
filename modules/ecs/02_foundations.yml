@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+
+Resources:
+  SlackChannelConfiguration:
+    Type: AWS::Chatbot::SlackChannelConfiguration
+    Properties:
+      ConfigurationName: !Sub ${ProjectName}-chatbot
+      IamRoleArn: { 'Fn::ImportValue': !Sub "${ProductName}:ChatbotRoleArn" }
+      LoggingLevel: ERROR
+      SlackChannelId: !Ref SlackChannelId
+      SlackWorkspaceId: !Ref SlackWorkspaceId
+
+  Repository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Ref ProjectName
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${ProjectName}
+
+Outputs:
+  RepositoryURI:
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}"
+  LogGroup:
+    Value: !Ref LogGroup

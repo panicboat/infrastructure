@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref ProductName
+      GroupName: !Ref ProductName
+      GroupDescription: !Sub Allows traffic between ${ProductName} resources.
+      VpcId: !Ref VpcId
+
+  SecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref SecurityGroup
+
+  AllowGlobalTrafficSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub allow-global-traffic-for-${ProductName}
+      GroupName: !Sub allow-global-traffic-for-${ProductName}
+      GroupDescription: !Sub Allows traffic from the Internet.
+      VpcId: !Ref VpcId
+
+  AllowGlobalTrafficSgIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AllowGlobalTrafficSg
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
+
+Outputs:
+  SecurityGroup:
+    Value: !Ref SecurityGroup
+    Export:
+      Name: !Sub ${ProductName}:SecurityGroup
+  AllowGlobalTrafficSg:
+    Value: !Ref AllowGlobalTrafficSg

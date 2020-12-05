@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Services for Application Template
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  ContainerName:
+    Type: String
+  DesiredCount:
+    Type: Number
+  TaskDefinitionArn:
+    Type: String
+  ServiceDiscoveryName:
+    Type: String
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  ServiceDiscovery:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 60
+        NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:PrivateDnsNamespaceId" }
+      Name: !Ref ServiceDiscoveryName
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }
+          Subnets: !Ref ProtectedSubnets
+      ServiceName: !Ref ProjectName
+      ServiceRegistries:
+        - RegistryArn: !GetAtt ServiceDiscovery.Arn
+      TaskDefinition: !Ref TaskDefinitionArn

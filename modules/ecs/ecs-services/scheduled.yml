@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Services for Application Template
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  ContainerName:
+    Type: String
+  TaskCount:
+    Type: Number
+  TaskDefinitionArn:
+    Type: String
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  ScheduledTask:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub ${ProjectName}-scheduled-task
+      Description:
+      State: ENABLED
+      ScheduleExpression: cron(0 0 * * ? *)
+      Targets:
+        - Id: !Ref ProjectName
+          Arn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
+          RoleArn: !Ref EcsTaskRoleArn
+          EcsParameters:
+            TaskDefinitionArn: !Ref TaskDefinitionArn
+            TaskCount: !Ref TaskCount
+            LaunchType: FARGATE
+            NetworkConfiguration:
+              AwsVpcConfiguration:
+                AssignPublicIp: DISABLED
+                SecurityGroups:
+                  - { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }
+                Subnets: !Ref ProtectedSubnets
+          Input: !Join [
+            '',
+            [
+              "{",
+              "   \"containerOverrides\": [ ",
+              "     {",
+        !Sub  "       \"name\": \"${ContainerName}\", ",
+        !Sub  "       \"command\": [\"echo hello\"]",
+              "     } ",
+              "   ]",
+              "}",
+            ]
+          ]

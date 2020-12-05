@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+
+Resources:
+  CognitoStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./cognito.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName

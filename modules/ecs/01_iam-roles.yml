@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  AllowEcsPolicy:
+    Type: CommaDelimitedList
+
+Resources:
+  EcsTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      RoleName: !Sub ${ProjectName}-task-execution-role
+
+  EcsTaskExecutionRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${ProjectName}-task-execution-role-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - ecr:GetLifecyclePolicyPreview
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+              - ecr:DescribeImages
+              - ecr:ListTagsForResource
+              - ecr:BatchCheckLayerAvailability
+              - ecr:GetLifecyclePolicy
+              - ecr:GetRepositoryPolicy
+            Resource: !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/*"
+          - Effect: Allow
+            Action:
+              - ecr:GetAuthorizationToken
+              - ssm:GetParameters
+              - secretsmanager:GetSecretValue
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*"
+      Roles:
+        - Ref: EcsTaskExecutionRole
+
+  EcsTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceEventsRole
+      RoleName: !Sub ${ProjectName}-task-role
+
+  EcsTaskRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${ProjectName}-task-role-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: !Ref AllowEcsPolicy
+            Resource: '*'
+      Roles:
+        - Ref: EcsTaskRole
+
+Outputs:
+  EcsTaskExecutionRole:
+    Value: !GetAtt EcsTaskExecutionRole.Arn
+  EcsTaskExecutionRole:
+    Value: !GetAtt EcsTaskExecutionRole.Arn

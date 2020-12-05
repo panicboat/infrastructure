@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  ContainerName:
+    Type: String
+  ContainerPort:
+    Type: Number
+  Cpu:
+    Type: Number
+  Memory:
+    Type: Number
+  EcsTaskExecutionRoleArn:
+    Type: String
+  EcsTaskRoleArn:
+    Type: String
+  RepositoryURI:
+    Type: String
+  LogGroup:
+    Type: String
+
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref ProjectName
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: !Ref Cpu
+      Memory: !Ref Memory
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref EcsTaskExecutionRoleArn
+      TaskRoleArn: !Ref EcsTaskRoleArn
+      ContainerDefinitions:
+        - Name: !Ref ContainerName
+          Image: !Ref RepositoryURI
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+              HostPort: !Ref ContainerPort
+              Protocol: tcp
+          EntryPoint:
+            - sh
+            - -c
+          Environment:
+            - Name: TZ
+              Value: Asia/Tokyo
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: !Ref ProjectName
+          Essential: true
+
+Outputs:
+  TaskDefinitionArn:
+    Value: !Ref TaskDefinition

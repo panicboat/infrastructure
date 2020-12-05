@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Services for Application Template
+
+Parameters:
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  ContainerName:
+    Type: String
+  ContainerPort:
+    Type: Number
+  DesiredCount:
+    Type: Number
+  TaskDefinitionArn:
+    Type: String
+  Priority:
+    Type: Number
+  PathPattern:
+    Type: CommaDelimitedList
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckPort: !Ref ContainerPort
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 6
+      HealthyThresholdCount: 3
+      Name: !Ref ProjectName
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      UnhealthyThresholdCount: 3
+      TargetType: ip
+      VpcId: !Ref VpcId
+
+  ListnenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+          Order: 1
+      Conditions:
+        - Field: path-pattern
+          Values: !Ref PathPattern
+      ListenerArn: { 'Fn::ImportValue': !Sub "${ProductName}:HttpsListenerArn" }
+      Priority: !Ref Priority
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: !Ref ContainerName
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }
+          Subnets: !Ref ProtectedSubnets
+      ServiceName: !Ref ProjectName
+      TaskDefinition: !Ref TaskDefinitionArn
