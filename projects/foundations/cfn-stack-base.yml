@@ -13,28 +13,28 @@ Parameters:
     Type: String
   CallbackURLs:
     Type: String
-  PrivateDnsNamespace:
+  ServicesDomain:
     Type: String
 
 Resources:
-  Route53:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./route53.yml
-      Parameters:
-        ProductName: !Ref ProductName
-        DomainName: !Ref DomainName
-        HostedZoneId: !Ref HostedZoneId
+  # Route53:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ./route53.yml
+  #     Parameters:
+  #       ProductName: !Ref ProductName
+  #       DomainName: !Ref DomainName
+  #       HostedZoneId: !Ref HostedZoneId
 
-  CognitoUserPool:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./cognito.yml
-      Parameters:
-        ProductName: !Ref ProductName
-        CallbackURLs: !Ref CallbackURLs
-        DomainName: !Ref DomainName
-        CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
+  # CognitoUserPool:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ./cognito.yml
+  #     Parameters:
+  #       ProductName: !Ref ProductName
+  #       CallbackURLs: !Ref CallbackURLs
+  #       DomainName: !Ref DomainName
+  #       CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
 
   IAM:
     Type: AWS::CloudFormation::Stack
@@ -51,17 +51,17 @@ Resources:
         ProductName: !Ref ProductName
         VpcId: !Ref VpcId
 
-  ElasticLoadBalancer:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./elb.yml
-      Parameters:
-        ProductName: !Ref ProductName
-        HostedZoneId: !Ref HostedZoneId
-        DomainName: !Ref DomainName
-        PublicSubnets: !Join [',', !Ref PublicSubnets]
-        CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
-        SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup], !GetAtt [VPC, Outputs.AllowGlobalTrafficSg]]]
+  # ElasticLoadBalancer:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ./elb.yml
+  #     Parameters:
+  #       ProductName: !Ref ProductName
+  #       HostedZoneId: !Ref HostedZoneId
+  #       DomainName: !Ref DomainName
+  #       PublicSubnets: !Join [',', !Ref PublicSubnets]
+  #       CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
+  #       SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup], !GetAtt [VPC, Outputs.AllowGlobalTrafficSg]]]
 
   ElasticContainerService:
     Type: AWS::CloudFormation::Stack
@@ -70,4 +70,4 @@ Resources:
       Parameters:
         ProductName: !Ref ProductName
         VpcId: !Ref VpcId
-        PrivateDnsNamespace: !Ref PrivateDnsNamespace
+        ServicesDomain: !Ref ServicesDomain

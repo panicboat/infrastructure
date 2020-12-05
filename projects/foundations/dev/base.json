@@ -4,5 +4,5 @@
   "DomainName": "panicboat.net",
   "HostedZoneId": "Z02175842S00OVKBT3L0A",
   "CallbackURLs": "http://localhost:1000",
-  "PrivateDnsNamespace": "default.svc.cluster.local"
+  "ServicesDomain": "default.svc.cluster.local"
 }

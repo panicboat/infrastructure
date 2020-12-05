@@ -5,7 +5,7 @@ Parameters:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
-  PrivateDnsNamespace:
+  ServicesDomain:
     Type: String
 
 Resources:
@@ -14,16 +14,16 @@ Resources:
     Properties:
       ClusterName: !Ref ProductName
 
-  Mesh:
+  ServiceMesh:
     Type: AWS::AppMesh::Mesh
     Properties:
       MeshName: !Ref ProductName
 
-  PrivateDnsNamespace:
+  ServiceDiscovery:
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
     Properties:
       Vpc: !Ref VpcId
-      Name: !Ref PrivateDnsNamespace
+      Name: !Ref ServicesDomain
 
 Outputs:
   ClusterArn:
@@ -31,7 +31,7 @@ Outputs:
     Export:
       Name: !Sub ${ProductName}:ClusterArn
 
-  Mesh:
-    Value: !Ref Mesh
+  ServiceMesh:
+    Value: !Ref ServiceMesh
     Export:
-      Name: !Sub ${ProductName}:Mesh
+      Name: !Sub ${ProductName}:ServiceMesh
