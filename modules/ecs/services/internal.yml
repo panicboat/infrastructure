@@ -1,18 +1,13 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: ECS Services for Application Template
+AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
   ProductName:
     Type: String
   ProjectName:
     Type: String
-  ContainerName:
-    Type: String
   DesiredCount:
     Type: Number
   TaskDefinitionArn:
-    Type: String
-  ServiceDiscoveryName:
     Type: String
   ProtectedSubnets:
     Type: List<AWS::EC2::Subnet::Id>
@@ -27,8 +22,8 @@ Resources:
         DnsRecords:
           - Type: A
             TTL: 60
-        NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:PrivateDnsNamespaceId" }
-      Name: !Ref ServiceDiscoveryName
+        NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
+      Name: !Ref ProjectName
 
   Service:
     Type: AWS::ECS::Service

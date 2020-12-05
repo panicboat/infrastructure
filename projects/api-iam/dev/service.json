@@ -6,5 +6,6 @@
     "ContainerPort": 80,
     "TaskCpu": 256,
     "TaskMemory": 512,
+    "DesiredCount": 0,
     "ServicesDomain": "default.svc.cluster.local"
 }

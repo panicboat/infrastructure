@@ -5,6 +5,8 @@ Parameters:
     Type: String
   ProjectName:
     Type: String
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
   AllowEcsPolicy:
     Type: CommaDelimitedList
   ContainerName:
@@ -14,6 +16,8 @@ Parameters:
   TaskCpu:
     Type: Number
   TaskMemory:
+    Type: Number
+  DesiredCount:
     Type: Number
   ServicesDomain:
     Type: String
@@ -61,3 +65,14 @@ Resources:
         ProjectName: !Ref ProjectName
         ContainerPort: !Ref ContainerPort
         ServicesDomain: !Ref ServicesDomain
+
+  Service:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/ecs/services/internal.yml
+      Parameters:
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        DesiredCount: !Ref DesiredCount
+        TaskDefinitionArn: !GetAtt [TaskDefinitions, Outputs.TaskDefinitionArn]
+        ProtectedSubnets: !Join [',', !Ref ProtectedSubnets]

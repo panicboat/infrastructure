@@ -18,6 +18,9 @@ Resources:
     Type: AWS::AppMesh::Mesh
     Properties:
       MeshName: !Ref ProductName
+      Spec:
+        EgressFilter:
+          Type: DROP_ALL
 
   ServiceDiscovery:
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
@@ -35,3 +38,8 @@ Outputs:
     Value: !GetAtt ServiceMesh.MeshName
     Export:
       Name: !Sub ${ProductName}:ServiceMesh
+
+  ServiceDiscoveryId:
+    Value: !GetAtt ServiceDiscovery.Id
+    Export:
+      Name: !Sub ${ProductName}:ServiceDiscoveryId
