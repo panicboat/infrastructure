@@ -13,6 +13,8 @@ Parameters:
     Type: String
   CallbackURLs:
     Type: String
+  PrivateDnsNamespace:
+    Type: String
 
 Resources:
   Route53:
@@ -68,3 +70,4 @@ Resources:
       Parameters:
         ProductName: !Ref ProductName
         VpcId: !Ref VpcId
+        PrivateDnsNamespace: !Ref PrivateDnsNamespace

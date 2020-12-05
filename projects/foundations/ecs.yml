@@ -5,6 +5,8 @@ Parameters:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
+  PrivateDnsNamespace:
+    Type: String
 
 Resources:
   Cluster:
@@ -17,8 +19,19 @@ Resources:
     Properties:
       MeshName: !Ref ProductName
 
+  PrivateDnsNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Vpc: !Ref VpcId
+      Name: !Ref PrivateDnsNamespace
+
 Outputs:
   ClusterArn:
     Value: !GetAtt Cluster.Arn
     Export:
       Name: !Sub ${ProductName}:ClusterArn
+
+  Mesh:
+    Value: !Ref Mesh
+    Export:
+      Name: !Sub ${ProductName}:Mesh
