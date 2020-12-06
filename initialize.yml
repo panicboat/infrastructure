@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ''
 
 Parameters:
-  ProductName:
+  PlatformName:
     Type: String
 
 Resources:
@@ -21,4 +21,4 @@ Outputs:
   ArtifactBucket:
     Value: !Ref ArtifactBucket
     Export:
-      Name: !Join [':', [!Ref ProductName, ArtifactBucket]]
+      Name: !Join [':', [!Ref PlatformName, ArtifactBucket]]

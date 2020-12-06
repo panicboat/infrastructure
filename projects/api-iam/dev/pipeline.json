@@ -1,6 +1,15 @@
 {
-    "ProductName": "panicboat",
+    "PlatformName": "panicboat",
+    "ProductName": "platform",
     "ProjectName": "api-iam",
+    "GitHubOwner": "panicboat",
+    "GitHubRepository": "api-iam",
+    "GitHubBranch": "master",
+    "ReleaseVersion": "1.0",
+    "ReleaseAccount": "000000000000",
+    "ContainerName": "app",
+    "BuildDirectory": ".",
     "SlackWorkspaceId": "T016YGKTF8B",
-    "SlackChannelId": "C01AQTMTF9V"
+    "SlackChannelId": "C01AQTMTF9V",
+    "CICredentialArn": "arn:aws:secretsmanager:ap-northeast-1:638067701901:secret:CICredential-GaMRgY"
 }
