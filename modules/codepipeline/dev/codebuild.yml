@@ -93,11 +93,11 @@ Resources:
               ""
             ]
           ]
-      VpcConfig:
-        VpcId: !Ref VpcId
-        Subnets: !Ref ProtectedSubnets
-        SecurityGroupIds:
-          - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+      # VpcConfig:
+      #   VpcId: !Ref VpcId
+      #   Subnets: !Ref ProtectedSubnets
+      #   SecurityGroupIds:
+      #     - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
       TimeoutInMinutes: 30
       Cache:
         Type: LOCAL
@@ -107,7 +107,7 @@ Resources:
   GitHub:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: !Sub ${ProjectName}-github-release
+      Name: !Sub ${ProjectName}-github
       Artifacts:
         Type: CODEPIPELINE
       Environment:
@@ -159,17 +159,17 @@ Resources:
               "      - curl -X POST -H \"$authorization\" -H \"$content_type\" -d \"$params\" https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_PROJECT}/releases",
             ]
           ]
-      VpcConfig:
-        VpcId: !Ref VpcId
-        Subnets: !Ref ProtectedSubnets
-        SecurityGroupIds:
-          - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+      # VpcConfig:
+      #   VpcId: !Ref VpcId
+      #   Subnets: !Ref ProtectedSubnets
+      #   SecurityGroupIds:
+      #     - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
       TimeoutInMinutes: 30
 
   Release:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: !Sub ${ProjectName}-production-release
+      Name: !Sub ${ProjectName}-release
       Artifacts:
         Type: CODEPIPELINE
       Environment:
@@ -246,11 +246,11 @@ Resources:
               "",
             ]
           ]
-      VpcConfig:
-        VpcId: !Ref VpcId
-        Subnets: !Ref ProtectedSubnets
-        SecurityGroupIds:
-          - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+      # VpcConfig:
+      #   VpcId: !Ref VpcId
+      #   Subnets: !Ref ProtectedSubnets
+      #   SecurityGroupIds:
+      #     - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
       TimeoutInMinutes: 30
 
 Outputs:
