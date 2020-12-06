@@ -36,7 +36,7 @@ Resources:
   IAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/codepipeline/iam.yml
+      TemplateURL: ../../../modules/codepipeline/iam.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -45,7 +45,7 @@ Resources:
   Foundations:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/codepipeline/foundations.yml
+      TemplateURL: ../../../modules/codepipeline/foundations.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -56,7 +56,7 @@ Resources:
   CodeBuild:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/codepipeline/dev/codebuild.yml
+      TemplateURL: ../../../modules/codepipeline/dev/codebuild.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -76,7 +76,7 @@ Resources:
   CodePipeline:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/codepipeline/dev/codepipeline.yml
+      TemplateURL: ../../../modules/codepipeline/dev/codepipeline.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName

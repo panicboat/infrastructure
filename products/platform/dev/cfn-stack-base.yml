@@ -18,7 +18,7 @@ Resources:
   ElasticContainerService:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/base/ecs-cluster.yml
+      TemplateURL: ../../../modules/base/ecs-cluster.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName

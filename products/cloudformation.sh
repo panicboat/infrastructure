@@ -66,7 +66,7 @@ platform=`cat $SCRIPT_DIR/$product/$env/$template.json | jq -r '.PlatformName'`
 # ------------------------------------------------------------------------------------------------------
 artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$platform':ArtifactBucket")) | .Value'`
 aws cloudformation package \
-    --template-file $SCRIPT_DIR/$product/cfn-stack-$template.yml \
+    --template-file $SCRIPT_DIR/$product/$env/cfn-stack-$template.yml \
     --s3-bucket $artifact_bucket \
     --s3-prefix products/$product/cloudformation \
     --output-template-file $SCRIPT_DIR/$product/$env/.cfn-stack-$template.yml

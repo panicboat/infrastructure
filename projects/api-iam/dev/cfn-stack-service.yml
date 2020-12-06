@@ -26,7 +26,7 @@ Resources:
   IAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs/iam.yml
+      TemplateURL: ../../../modules/ecs/iam.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -36,7 +36,7 @@ Resources:
   Foundations:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs/foundations.yml
+      TemplateURL: ../../../modules/ecs/foundations.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -45,7 +45,7 @@ Resources:
   TaskDefinitions:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs/task-definitions.yml
+      TemplateURL: ../../../modules/ecs/task-definitions.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -62,7 +62,7 @@ Resources:
   AppMesh:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs/app-mesh.yml
+      TemplateURL: ../../../modules/ecs/app-mesh.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -72,7 +72,7 @@ Resources:
   Service:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs/services/internal.yml
+      TemplateURL: ../../../modules/ecs/services/internal.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
