@@ -1,6 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-
 Parameters:
   PlatformName:
     Type: String
@@ -108,9 +107,9 @@ Resources:
                 Version: 1
                 Provider: Manual
               RunOrder: 1
-        - Name: GitHub
+        - Name: Release
           Actions:
-            - Name: CodeBuild
+            - Name: GitHub
               InputArtifacts:
                 - Name: SourceCode
               ActionTypeId:
@@ -121,9 +120,7 @@ Resources:
               Configuration:
                 ProjectName: !Ref GitHubTag
               RunOrder: 1
-        - Name: Release
-          Actions:
-            - Name: CodeBuild
+            - Name: Release
               InputArtifacts:
                 - Name: SourceCode
               ActionTypeId:
@@ -133,4 +130,4 @@ Resources:
                 Version: 1
               Configuration:
                 ProjectName: !Ref Release
-              RunOrder: 1
+              RunOrder: 2

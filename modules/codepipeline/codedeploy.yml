@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+
+Resources:
+  Application:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: !Ref ProjectName
+      ComputePlatform: ECS

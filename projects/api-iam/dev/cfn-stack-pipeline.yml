@@ -73,6 +73,15 @@ Resources:
         ProtectedSubnets: !Join [',', !Ref ProtectedSubnets]
         CodeBuildRole: !GetAtt [IAM, Outputs.CodeBuildRole]
 
+  # CodeDeploy:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ../../../modules/codepipeline/codedeploy.yml
+  #     Parameters:
+  #       PlatformName: !Ref PlatformName
+  #       ProductName: !Ref ProductName
+  #       ProjectName: !Ref ProjectName
+
   CodePipeline:
     Type: AWS::CloudFormation::Stack
     Properties:

@@ -42,10 +42,20 @@ Resources:
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
 
+  AppMesh:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../../modules/ecs/mesh/internal.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        ContainerPort: !Ref ContainerPort
+
   TaskDefinitions:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/task-definitions.yml
+      TemplateURL: ../../../modules/ecs/tasks/internal.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -58,16 +68,8 @@ Resources:
         EcsTaskRoleArn: !GetAtt [IAM, Outputs.EcsTaskRoleArn]
         RepositoryURI: !GetAtt [Foundations, Outputs.RepositoryURI]
         LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
-
-  AppMesh:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ../../../modules/ecs/app-mesh.yml
-      Parameters:
-        PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
-        ProjectName: !Ref ProjectName
-        ContainerPort: !Ref ContainerPort
+        VirtualNodeName: !GetAtt [AppMesh, Outputs.VirtualNodeName]
+        VirtualNodeArn: !GetAtt [AppMesh, Outputs.VirtualNodeArn]
 
   Service:
     Type: AWS::CloudFormation::Stack

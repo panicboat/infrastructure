@@ -23,6 +23,10 @@ Parameters:
     Type: String
   LogGroup:
     Type: String
+  VirtualNodeName:
+    Type: String
+  VirtualNodeArn:
+    Type: String
 
 Resources:
   TaskDefinition:
@@ -68,11 +72,11 @@ Resources:
               Protocol: tcp
           Environment:
             - Name: APPMESH_VIRTUAL_NODE_NAME
-              Value: ''
+              Value: !Ref VirtualNodeName
+            - Name: APPMESH_RESOURCE_ARN
+              Value: !Ref VirtualNodeArn
             - Name: ENVOY_LOG_LEVEL
               Value: info
-            - Name: APPMESH_XDS_ENDPOINT
-              Value: ''
             - Name: ENABLE_ENVOY_XRAY_TRACING
               Value: 1
             - Name: ENABLE_ENVOY_STATS_TAGS
@@ -109,6 +113,7 @@ Resources:
               awslogs-region: !Ref 'AWS::Region'
               awslogs-group: !Ref LogGroup
               awslogs-stream-prefix: xray
+          Essential: true
       ProxyConfiguration:
         ContainerName: envoy
         Type: APPMESH

@@ -67,3 +67,9 @@ Resources:
         ServiceDiscovery:
           DNS:
             Hostname: !Join ['.', [!Ref ProjectName, { 'Fn::ImportValue': !Sub "${ProductName}:PrivateNamespace" }]]
+
+Outputs:
+  VirtualNodeArn:
+    Value: VirtualNode.Arn
+  VirtualNodeName:
+    Value: VirtualNode.Name
