@@ -22,7 +22,7 @@ Resources:
   # Route53:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
-  #     TemplateURL: ./route53.yml
+  #     TemplateURL: ../route53.yml
   #     Parameters:
   #       PlatformName: !Ref PlatformName
   #       ProductName: !Ref ProductName
@@ -33,7 +33,7 @@ Resources:
   # CognitoUserPool:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
-  #     TemplateURL: ./cognito.yml
+  #     TemplateURL: ../cognito.yml
   #     Parameters:
   #       PlatformName: !Ref PlatformName
   #       ProductName: !Ref ProductName
@@ -45,7 +45,7 @@ Resources:
   IAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./iam.yml
+      TemplateURL: ../iam.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -54,7 +54,7 @@ Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./vpc.yml
+      TemplateURL: ../vpc.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
@@ -64,7 +64,7 @@ Resources:
   # ElasticLoadBalancer:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
-  #     TemplateURL: ./elb.yml
+  #     TemplateURL: ../elb.yml
   #     Parameters:
   #       PlatformName: !Ref PlatformName
   #       ProductName: !Ref ProductName
