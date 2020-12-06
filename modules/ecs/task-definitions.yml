@@ -54,6 +54,75 @@ Resources:
               awslogs-group: !Ref LogGroup
               awslogs-stream-prefix: !Ref ProjectName
           Essential: true
+        - Name: envoy
+          Image: !Sub "840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.15.1.0-prod"
+          PortMappings:
+            - ContainerPort: 9901
+              HostPort: 9901
+              Protocol: tcp
+            - ContainerPort: 15000
+              HostPort: 15000
+              Protocol: tcp
+            - ContainerPort: 15001
+              HostPort: 15001
+              Protocol: tcp
+          Environment:
+            - Name: APPMESH_VIRTUAL_NODE_NAME
+              Value: ''
+            - Name: ENVOY_LOG_LEVEL
+              Value: info
+            - Name: APPMESH_XDS_ENDPOINT
+              Value: ''
+            - Name: ENABLE_ENVOY_XRAY_TRACING
+              Value: 1
+            - Name: ENABLE_ENVOY_STATS_TAGS
+              Value: 1
+          HealthCheck:
+            Command: [ "CMD-SHELL", "curl -s http://localhost:9901/server_info | grep state | grep -q LIVE" ]
+            Interval: 5
+            Timeout: 2
+            Retries: 3
+          User: 1337
+          # Ulimits:
+          #   - Name: nofile
+          #     HardLimit: 15000
+          #     SoftLimit: 15000
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: envoy
+          Essential: true
+        - Name: xray
+          Image: amazon/aws-xray-daemon
+          PortMappings:
+            - ContainerPort: 2000
+              HostPort: 2000
+              Protocol: tcp
+          User: 1337
+          # Cpu: 32
+          # MemoryReservation: 256
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: xray
+      ProxyConfiguration:
+        ContainerName: envoy
+        Type: APPMESH
+        ProxyConfigurationProperties:
+          - Name: IgnoredUID
+            Value: 1337
+          - Name: ProxyIngressPort
+            Value: 15000
+          - Name: ProxyEgressPort
+            Value: 15001
+          - Name: AppPorts
+            Value: !Ref ContainerPort
+          - Name: EgressIgnoredIPs
+            Value: 169.254.170.2,169.254.169.254
 
 Outputs:
   TaskDefinitionArn:
