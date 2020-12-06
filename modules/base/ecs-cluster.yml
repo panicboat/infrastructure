@@ -9,7 +9,7 @@ Parameters:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
-  ServicesDomain:
+  PrivateNamespace:
     Type: String
 
 Resources:
@@ -30,7 +30,7 @@ Resources:
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
     Properties:
       Vpc: !Ref VpcId
-      Name: !Ref ServicesDomain
+      Name: !Ref PrivateNamespace
 
 Outputs:
   ClusterArn:
@@ -47,3 +47,8 @@ Outputs:
     Value: !GetAtt ServiceDiscovery.Id
     Export:
       Name: !Sub ${ProductName}:ServiceDiscoveryId
+
+  PrivateNamespace:
+    Value: !Ref PrivateNamespace
+    Export:
+      Name: !Sub ${ProductName}:PrivateNamespace

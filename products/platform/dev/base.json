@@ -2,5 +2,5 @@
     "PlatformName": "panicboat",
     "ProductName": "platform",
     "ProjectName": "base",
-    "ServicesDomain": "default.svc.cluster.local"
+    "PrivateNamespace": "platform.svc.cluster.local"
 }

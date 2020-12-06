@@ -21,8 +21,6 @@ Parameters:
     Type: Number
   DesiredCount:
     Type: Number
-  ServicesDomain:
-    Type: String
 
 Resources:
   IAM:
@@ -70,7 +68,6 @@ Resources:
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         ContainerPort: !Ref ContainerPort
-        ServicesDomain: !Ref ServicesDomain
 
   Service:
     Type: AWS::CloudFormation::Stack

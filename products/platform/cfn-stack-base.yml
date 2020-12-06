@@ -11,7 +11,7 @@ Parameters:
     Type: AWS::EC2::VPC::Id
   PublicSubnets:
     Type: List<AWS::EC2::Subnet::Id>
-  ServicesDomain:
+  PrivateNamespace:
     Type: String
 
 Resources:
@@ -24,4 +24,4 @@ Resources:
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         VpcId: !Ref VpcId
-        ServicesDomain: !Ref ServicesDomain
+        PrivateNamespace: !Ref PrivateNamespace

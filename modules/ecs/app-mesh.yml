@@ -9,15 +9,13 @@ Parameters:
     Type: String
   ContainerPort:
     Type: Number
-  ServicesDomain:
-    Type: String
 
 Resources:
   VirtualService:
     Type: AWS::AppMesh::VirtualService
     Properties:
       MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
-      VirtualServiceName: !Sub "${ProjectName}.${ServicesDomain}"
+      VirtualServiceName: !Join ['.', [!Ref ProjectName, { 'Fn::ImportValue': !Sub "${ProductName}:PrivateNamespace" }]]
       Spec:
         Provider:
           VirtualRouter:
@@ -68,4 +66,4 @@ Resources:
               IntervalMillis: 5000
         ServiceDiscovery:
           DNS:
-            Hostname: !Sub "${ProjectName}.${ServicesDomain}"
+            Hostname: !Join ['.', [!Ref ProjectName, { 'Fn::ImportValue': !Sub "${ProductName}:PrivateNamespace" }]]
