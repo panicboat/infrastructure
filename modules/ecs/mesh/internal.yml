@@ -70,6 +70,6 @@ Resources:
 
 Outputs:
   VirtualNodeArn:
-    Value: VirtualNode.Arn
+    Value: !GetAtt VirtualNode.Arn
   VirtualNodeName:
-    Value: VirtualNode.Name
+    Value: !GetAtt VirtualNode.VirtualNodeName

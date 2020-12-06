@@ -47,7 +47,6 @@ Resources:
             - ContainerPort: !Ref ContainerPort
               HostPort: !Ref ContainerPort
               Protocol: tcp
-          EntryPoint: [sh, -c]
           Environment:
             - Name: TZ
               Value: Asia/Tokyo

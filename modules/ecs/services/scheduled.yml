@@ -46,7 +46,7 @@ Resources:
               "   \"containerOverrides\": [ ",
               "     {",
         !Sub  "       \"name\": \"${ContainerName}\", ",
-        !Sub  "       \"command\": [\"echo hello\"]",
+        !Sub  "       \"command\": [\"echo\",\"hello\"]",
               "     } ",
               "   ]",
               "}",
