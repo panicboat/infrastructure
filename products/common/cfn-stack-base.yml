@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  PlatformName:
+    Type: String
   ProductName:
+    Type: String
+  ProjectName:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -13,8 +17,6 @@ Parameters:
     Type: String
   CallbackURLs:
     Type: String
-  ServicesDomain:
-    Type: String
 
 Resources:
   # Route53:
@@ -22,7 +24,9 @@ Resources:
   #   Properties:
   #     TemplateURL: ./route53.yml
   #     Parameters:
+  #       PlatformName: !Ref PlatformName
   #       ProductName: !Ref ProductName
+  #       ProjectName: !Ref ProjectName
   #       DomainName: !Ref DomainName
   #       HostedZoneId: !Ref HostedZoneId
 
@@ -31,7 +35,9 @@ Resources:
   #   Properties:
   #     TemplateURL: ./cognito.yml
   #     Parameters:
+  #       PlatformName: !Ref PlatformName
   #       ProductName: !Ref ProductName
+  #       ProjectName: !Ref ProjectName
   #       CallbackURLs: !Ref CallbackURLs
   #       DomainName: !Ref DomainName
   #       CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
@@ -41,14 +47,18 @@ Resources:
     Properties:
       TemplateURL: ./iam.yml
       Parameters:
+        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
 
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./vpc.yml
       Parameters:
+        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
         VpcId: !Ref VpcId
 
   # ElasticLoadBalancer:
@@ -56,18 +66,11 @@ Resources:
   #   Properties:
   #     TemplateURL: ./elb.yml
   #     Parameters:
+  #       PlatformName: !Ref PlatformName
   #       ProductName: !Ref ProductName
+  #       ProjectName: !Ref ProjectName
   #       HostedZoneId: !Ref HostedZoneId
   #       DomainName: !Ref DomainName
   #       PublicSubnets: !Join [',', !Ref PublicSubnets]
   #       CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
   #       SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup], !GetAtt [VPC, Outputs.AllowGlobalTrafficSg]]]
-
-  ElasticContainerService:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./ecs.yml
-      Parameters:
-        ProductName: !Ref ProductName
-        VpcId: !Ref VpcId
-        ServicesDomain: !Ref ServicesDomain

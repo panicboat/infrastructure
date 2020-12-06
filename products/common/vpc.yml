@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  PlatformName:
+    Type: String
   ProductName:
+    Type: String
+  ProjectName:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -12,9 +16,9 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref ProductName
-      GroupName: !Ref ProductName
-      GroupDescription: !Sub Allows traffic between ${ProductName} resources.
+          Value: !Ref PlatformName
+      GroupName: !Ref PlatformName
+      GroupDescription: !Sub Allows traffic between ${PlatformName} resources.
       VpcId: !Ref VpcId
 
   SecurityGroupIngress:
@@ -29,8 +33,8 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub allow-global-traffic-for-${ProductName}
-      GroupName: !Sub allow-global-traffic-for-${ProductName}
+          Value: !Sub allow-global-traffic-for-${PlatformName}
+      GroupName: !Sub allow-global-traffic-for-${PlatformName}
       GroupDescription: !Sub Allows traffic from the Internet.
       VpcId: !Ref VpcId
 
@@ -45,7 +49,7 @@ Outputs:
   SecurityGroup:
     Value: !Ref SecurityGroup
     Export:
-      Name: !Sub ${ProductName}:SecurityGroup
+      Name: !Sub ${PlatformName}:SecurityGroup
 
   AllowGlobalTrafficSg:
     Value: !Ref AllowGlobalTrafficSg

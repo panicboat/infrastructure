@@ -1,0 +1,8 @@
+{
+  "PlatformName": "panicboat",
+  "ProductName": "common",
+  "ProjectName": "",
+  "DomainName": "panicboat.net",
+  "HostedZoneId": "Z02175842S00OVKBT3L0A",
+  "CallbackURLs": "http://localhost:1000"
+}

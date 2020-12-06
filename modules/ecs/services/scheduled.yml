@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ECS Services for Application Template
 
 Parameters:
+  PlatformName:
+    Type: String
   ProductName:
     Type: String
   ProjectName:
@@ -35,7 +37,7 @@ Resources:
               AwsVpcConfiguration:
                 AssignPublicIp: DISABLED
                 SecurityGroups:
-                  - { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }
+                  - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
                 Subnets: !Ref ProtectedSubnets
           Input: !Join [
             '',

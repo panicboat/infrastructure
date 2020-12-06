@@ -1,0 +1,6 @@
+{
+    "PlatformName": "panicboat",
+    "ProductName": "platform",
+    "ProjectName": "base",
+    "ServicesDomain": "default.svc.cluster.local"
+}

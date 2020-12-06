@@ -1,6 +1,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  PlatformName:
+    Type: String
   ProductName:
     Type: String
   ProjectName:
@@ -28,6 +30,7 @@ Resources:
     Properties:
       TemplateURL: ../../modules/ecs/iam.yml
       Parameters:
+        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         AllowEcsPolicy: !Join [',', !Ref AllowEcsPolicy]
@@ -37,6 +40,7 @@ Resources:
     Properties:
       TemplateURL: ../../modules/ecs/foundations.yml
       Parameters:
+        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
 
@@ -45,6 +49,7 @@ Resources:
     Properties:
       TemplateURL: ../../modules/ecs/task-definitions.yml
       Parameters:
+        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         ContainerName: !Ref ContainerName
@@ -61,6 +66,7 @@ Resources:
     Properties:
       TemplateURL: ../../modules/ecs/app-mesh.yml
       Parameters:
+        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         ContainerPort: !Ref ContainerPort
@@ -71,6 +77,7 @@ Resources:
     Properties:
       TemplateURL: ../../modules/ecs/services/internal.yml
       Parameters:
+        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         DesiredCount: !Ref DesiredCount

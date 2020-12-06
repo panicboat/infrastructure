@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  PlatformName:
+    Type: String
   ProductName:
+    Type: String
+  ProjectName:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id

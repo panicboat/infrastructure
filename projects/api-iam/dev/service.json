@@ -1,5 +1,6 @@
 {
-    "ProductName": "panicboat",
+    "PlatformName": "panicboat",
+    "ProductName": "platform",
     "ProjectName": "api-iam",
     "AllowEcsPolicy": "s3:*",
     "ContainerName": "app",

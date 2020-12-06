@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  PlatformName:
+    Type: String
   ProductName:
+    Type: String
+  ProjectName:
     Type: String
   HostedZoneId:
     Type: String
@@ -29,7 +33,7 @@ Resources:
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub ${ProductName}-alb
+      Name: !Sub ${PlatformName}-alb
       Scheme: internet-facing
       Subnets: !Ref PublicSubnets
       Type: application
@@ -72,9 +76,9 @@ Outputs:
   HttpListenerArn:
     Value: !Ref HttpListener
     Export:
-      Name: !Sub ${ProductName}:HttpListenerArn
+      Name: !Sub ${PlatformName}:HttpListenerArn
 
   HttpsListenerArn:
     Value: !Ref HttpsListener
     Export:
-      Name: !Sub ${ProductName}:HttpsListenerArn
+      Name: !Sub ${PlatformName}:HttpsListenerArn

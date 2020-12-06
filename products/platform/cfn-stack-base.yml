@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PublicSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  ServicesDomain:
+    Type: String
+
+Resources:
+  ElasticContainerService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/base/ecs-cluster.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        VpcId: !Ref VpcId
+        ServicesDomain: !Ref ServicesDomain
