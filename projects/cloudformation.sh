@@ -69,7 +69,7 @@ artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 's
 aws cloudformation package \
     --template-file $SCRIPT_DIR/$project/$env/cfn-stack-$template.yml \
     --s3-bucket $artifact_bucket \
-    --s3-prefix projects/$project/cloudformation \
+    --s3-prefix $project/cloudformation \
     --output-template-file $SCRIPT_DIR/$project/$env/.cfn-stack-$template.yml
 if [ $? -ne 0 ]; then
     exit $?
