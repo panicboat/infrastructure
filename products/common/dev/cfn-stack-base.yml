@@ -19,28 +19,28 @@ Parameters:
     Type: String
 
 Resources:
-  # Route53:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ../route53.yml
-  #     Parameters:
-  #       PlatformName: !Ref PlatformName
-  #       ProductName: !Ref ProductName
-  #       ProjectName: !Ref ProjectName
-  #       DomainName: !Ref DomainName
-  #       HostedZoneId: !Ref HostedZoneId
+  Certificate:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../certificate.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
 
-  # CognitoUserPool:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: ../cognito.yml
-  #     Parameters:
-  #       PlatformName: !Ref PlatformName
-  #       ProductName: !Ref ProductName
-  #       ProjectName: !Ref ProjectName
-  #       CallbackURLs: !Ref CallbackURLs
-  #       DomainName: !Ref DomainName
-  #       CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
+  CognitoUserPool:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../cognito.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        CallbackURLs: !Ref CallbackURLs
+        DomainName: !Ref DomainName
+        CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
 
   IAM:
     Type: AWS::CloudFormation::Stack
@@ -72,5 +72,5 @@ Resources:
   #       HostedZoneId: !Ref HostedZoneId
   #       DomainName: !Ref DomainName
   #       PublicSubnets: !Join [',', !Ref PublicSubnets]
-  #       CertificateArn: !GetAtt [Route53, Outputs.CertificateArn]
+  #       CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
   #       SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup], !GetAtt [VPC, Outputs.AllowGlobalTrafficSg]]]

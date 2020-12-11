@@ -81,7 +81,7 @@ Resources:
             - Name: ENABLE_ENVOY_STATS_TAGS
               Value: 1
           HealthCheck:
-            Command: [ "CMD-SHELL", "curl -s http://localhost:9901/server_info | grep state | grep -q LIVE" ]
+            Command: [ "CMD-SHELL", "curl -s http://127.0.0.1:9901/server_info | grep state | grep -q LIVE" ]
             Interval: 5
             Timeout: 2
             Retries: 3
