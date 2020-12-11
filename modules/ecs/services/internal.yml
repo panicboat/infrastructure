@@ -35,7 +35,7 @@ Resources:
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
+          AssignPublicIp: ENABLED   # TODO: Set to DISABLED when using NAT Gateway
           SecurityGroups:
             - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
           Subnets: !Ref ProtectedSubnets
