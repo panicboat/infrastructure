@@ -50,6 +50,8 @@ Resources:
           Environment:
             - Name: TZ
               Value: Asia/Tokyo
+            - Name: RAILS_LOG_TO_STDOUT
+              Value: true
           LogConfiguration:
             LogDriver: awslogs
             Options:
