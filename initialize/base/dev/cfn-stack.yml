@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PublicSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  Certificate:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../certificate.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../iam.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../vpc.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        VpcId: !Ref VpcId
+
+  ElasticLoadBalancer:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../elb.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+        PublicSubnets: !Join [',', !Ref PublicSubnets]
+        SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup]]]

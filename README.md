@@ -10,7 +10,7 @@ Register in AWS Secrets Manager.
 
 ```
 {
-  "GitHubPersonalAccessToken": "GitHubアクセストークン",
+  "GitHubAccessToken": "GitHubアクセストークン",
   "GitHubUserName": "GitHubアカウント名",
   "DockerHubID": "DockerHubログインID",
   "DockerHubPassword": "DockerHubパスワード"
@@ -19,17 +19,17 @@ Register in AWS Secrets Manager.
 
 # Usage
 
-## Initialize ( at onece )
+## Initialize ( at once )
 
 ```bash
-sh initialize.sh
-sh products/cloudformation.sh -e dev -p common -t base
+sh artifacts/cloudformation.sh
+sh initialize/cloudformation.sh -e dev -p base
 ```
 
-## Products Base
+## Provisioning Products
 
-```bash
-sh products/cloudformation.sh -e dev -p platform -t base
+```
+sh initialize/cloudformation.sh -e dev -p platform
 ```
 
 ## Project Service

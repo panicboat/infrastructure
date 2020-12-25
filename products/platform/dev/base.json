@@ -1,6 +1,0 @@
-{
-    "PlatformName": "panicboat",
-    "ProductName": "platform",
-    "ProjectName": "base",
-    "PrivateNamespace": "platform.svc.cluster.local"
-}

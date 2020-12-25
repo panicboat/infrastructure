@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref PlatformName
+      GroupName: !Ref PlatformName
+      GroupDescription: !Sub Allows traffic between ${PlatformName} resources.
+      VpcId: !Ref VpcId
+
+  SecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroup
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
+
+Outputs:
+  SecurityGroup:
+    Value: !Ref SecurityGroup

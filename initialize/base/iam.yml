@@ -4,10 +4,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   PlatformName:
     Type: String
-  ProductName:
-    Type: String
-  ProjectName:
-    Type: String
 
 Resources:
   EC2RoleforSSM:

@@ -5,23 +5,31 @@ Parameters:
     Type: String
   ProductName:
     Type: String
-  ProjectName:
+  CallbackURLs:
+    Type: String
+  DomainName:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
   PublicSubnets:
     Type: List<AWS::EC2::Subnet::Id>
-  PrivateNamespace:
-    Type: String
 
 Resources:
-  ElasticContainerService:
+  CognitoUserPool:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/base/ecs-cluster.yml
+      TemplateURL: ../cognito.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        CallbackURLs: !Ref CallbackURLs
+        CertificateArn: { 'Fn::ImportValue': !Sub "${PlatformName}:CertificateArn" }
+        DomainName: !Ref DomainName
+
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../vpc.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
-        ProjectName: !Ref ProjectName
         VpcId: !Ref VpcId
-        PrivateNamespace: !Ref PrivateNamespace

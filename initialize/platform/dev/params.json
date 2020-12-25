@@ -1,0 +1,6 @@
+{
+  "PlatformName": "panicboat",
+  "ProductName": "platform",
+  "CallbackURLs": "http://localhost:1000",
+  "DomainName": "panicboat.net"
+}

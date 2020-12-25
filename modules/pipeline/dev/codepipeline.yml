@@ -63,7 +63,7 @@ Resources:
                 Owner: !Ref GitHubOwner
                 Repo: !Ref GitHubRepository
                 Branch: !Ref GitHubBranch
-                OAuthToken: !Sub '{{resolve:secretsmanager:${CICredentialArn}:SecretString:GitHubPersonalAccessToken}}'
+                OAuthToken: !Sub '{{resolve:secretsmanager:${CICredentialArn}:SecretString:GitHubAccessToken}}'
               OutputArtifacts:
                 - Name: SourceCode
               RunOrder: 1

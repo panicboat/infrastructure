@@ -3,15 +3,11 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   PlatformName:
     Type: String
-  ProductName:
-    Type: String
-  ProjectName:
-    Type: String
   CallbackURLs:
     Type: CommaDelimitedList
-  DomainName:
-    Type: String
   CertificateArn:
+    Type: String
+  DomainName:
     Type: String
 
 Resources:

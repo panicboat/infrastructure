@@ -3,15 +3,11 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   PlatformName:
     Type: String
-  ProductName:
-    Type: String
-  ProjectName:
-    Type: String
-  HostedZoneId:
+  CertificateArn:
     Type: String
   DomainName:
     Type: String
-  CertificateArn:
+  HostedZoneId:
     Type: String
   PublicSubnets:
     Type: List<AWS::EC2::Subnet::Id>

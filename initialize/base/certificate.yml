@@ -3,10 +3,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   PlatformName:
     Type: String
-  ProductName:
-    Type: String
-  ProjectName:
-    Type: String
   DomainName:
     Type: String
   HostedZoneId:
@@ -38,3 +34,5 @@ Resources:
 Outputs:
   CertificateArn:
     Value: !Ref Certificate
+    Export:
+      Name: !Sub ${PlatformName}:CertificateArn
