@@ -63,18 +63,6 @@ platform=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '.PlatformName'`
 product=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '.ProductName'`
 
 # ------------------------------------------------------------------------------------------------------
-# Create TaskDefinitions use Docker
-# ------------------------------------------------------------------------------------------------------
-cd $SCRIPT_DIR/../
-task_template_path=modules/ecs/task-definitions.yml.erb
-param_template_path=projects/$project/$env/environments.yml
-output_path=tmp/task-definitions.yml
-docker-compose run app bash -c "ruby engine.rb --template $task_template_path --parameter $param_template_path > $output_path"
-if [ $? -ne 0 ]; then
-    exit $?
-fi
-
-# ------------------------------------------------------------------------------------------------------
 # Package
 # ------------------------------------------------------------------------------------------------------
 artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$platform':ArtifactBucket")) | .Value'`

@@ -1,5 +1,15 @@
 {
   "PlatformName": "panicboat",
   "DomainName": "panicboat.net",
-  "HostedZoneId": "Z02175842S00OVKBT3L0A"
+  "HostedZoneId": "Z02175842S00OVKBT3L0A",
+  "PrivateCidrA": "172.31.160.0/20",
+  "PrivateCidrC": "172.31.176.0/20",
+  "PrivateCidrD": "172.31.192.0/20",
+  "ProtectCidrA": "172.31.64.0/19",
+  "ProtectCidrC": "172.31.96.0/19",
+  "ProtectCidrD": "172.31.128.0/19",
+  "PublicCidrA": "172.31.0.0/20",
+  "PublicCidrC": "172.31.16.0/20",
+  "PublicCidrD": "172.31.32.0/20",
+  "VpcCidrBlock": "172.31.0.0/16"
 }

@@ -3,27 +3,65 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   PlatformName:
     Type: String
-  VpcId:
-    Type: AWS::EC2::VPC::Id
+  VpcCidrBlock:
+    Type: String
 
 Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Ref PlatformName
+
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref PlatformName
-      GroupName: !Ref PlatformName
+          Value: !Sub ${PlatformName}-api
+      GroupName: !Sub ${PlatformName}-api
       GroupDescription: !Sub Allows traffic between ${PlatformName} resources.
-      VpcId: !Ref VpcId
+      VpcId: !Ref Vpc
 
   SecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       GroupId: !Ref SecurityGroup
       IpProtocol: -1
+      SourceSecurityGroupId: !Ref SecurityGroup
+
+  SecurityGroupPublic:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref PlatformName
+      GroupName: !Ref PlatformName
+      GroupDescription: !Sub Allows public traffic for ${PlatformName}.
+      VpcId: !Ref Vpc
+
+  SecurityGroupPublicIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupPublic
+      IpProtocol: -1
       CidrIp: 0.0.0.0/0
 
 Outputs:
+  VpcId:
+    Value: !Ref Vpc
+    Export:
+      Name: !Sub ${PlatformName}:VpcId
+
   SecurityGroup:
     Value: !Ref SecurityGroup
+    Export:
+      Name: !Sub ${PlatformName}:SecurityGroup
+
+  SecurityGroupPublic:
+    Value: !Ref SecurityGroupPublic

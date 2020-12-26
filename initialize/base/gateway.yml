@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnetC:
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnetD:
+    Type: AWS::EC2::Subnet::Id
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  # --------------------------------------------------
+  # AWS::EC2::InternetGateway
+  # --------------------------------------------------
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref PlatformName
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VpcId
+
+  # --------------------------------------------------
+  # AWS::EC2::NatGateway
+  # --------------------------------------------------
+  NatGatewayA:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EipA.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-natgateway-a
+
+  EipA:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NatGatewayC:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EipC.AllocationId
+      SubnetId: !Ref PublicSubnetC
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-natgateway-c
+
+  EipC:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NatGatewayD:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EipD.AllocationId
+      SubnetId: !Ref PublicSubnetD
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-natgateway-d
+
+  EipD:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+Outputs:
+  InternetGateway:
+    Value: !Ref InternetGateway
+
+  NatGatewayA:
+    Value: !Ref NatGatewayA
+
+  NatGatewayC:
+    Value: !Ref NatGatewayC
+
+  NatGatewayD:
+    Value: !Ref NatGatewayD

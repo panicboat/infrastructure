@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  GatewayId:
+    Type: String
+  NatGatewayA:
+    Type: String
+  NatGatewayC:
+    Type: String
+  NatGatewayD:
+    Type: String
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnetC:
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnetD:
+    Type: AWS::EC2::Subnet::Id
+  ProtectSubnetA:
+    Type: AWS::EC2::Subnet::Id
+  ProtectSubnetC:
+    Type: AWS::EC2::Subnet::Id
+  ProtectSubnetD:
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnetC:
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnetD:
+    Type: AWS::EC2::Subnet::Id
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  # --------------------------------------------------
+  # AWS::EC2::RouteTable for Public
+  # --------------------------------------------------
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-public
+      VpcId: !Ref VpcId
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref PublicRouteTable
+      GatewayId: !Ref GatewayId
+
+  PublicAssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetA
+
+  PublicAssociationC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetC
+
+  PublicAssociationD:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetD
+
+  # --------------------------------------------------
+  # AWS::EC2::RouteTable for Protect
+  # --------------------------------------------------
+  ProtectRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-protect
+      VpcId: !Ref VpcId
+
+  ProtectRouteA:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref ProtectRouteTableA
+      NatGatewayId: !Ref NatGatewayA
+
+  ProtectAssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref ProtectRouteTableA
+      SubnetId: !Ref ProtectSubnetA
+
+  ProtectRouteTableC:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-protect
+      VpcId: !Ref VpcId
+
+  ProtectRouteC:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref ProtectRouteTableC
+      NatGatewayId: !Ref NatGatewayC
+
+  ProtectAssociationC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref ProtectRouteTableC
+      SubnetId: !Ref ProtectSubnetC
+
+  ProtectRouteTableD:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-protect
+      VpcId: !Ref VpcId
+
+  ProtectRouteD:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref ProtectRouteTableD
+      NatGatewayId: !Ref NatGatewayD
+
+  ProtectAssociationD:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref ProtectRouteTableD
+      SubnetId: !Ref ProtectSubnetD
+
+  # --------------------------------------------------
+  # AWS::EC2::RouteTable for Private
+  # --------------------------------------------------
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-private
+      VpcId: !Ref VpcId
+
+  PrivateAssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetA
+
+  PrivateAssociationC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetC
+
+  PrivateAssociationD:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetD
