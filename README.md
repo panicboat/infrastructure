@@ -44,7 +44,7 @@ sh initialize/cloudformation.sh -e $env -p $product
 ```bash
 template_path=modules/ecs/task-definitions.yml.erb
 parameter_path=projects/$project/$env/environments.yml
-output_path=projects/.task-definitions.yml
+output_path=projects/$project/$env/.task-definitions.yml
 docker-compose run app bash -c "ruby engine.rb --template $template_path --parameter $parameter_path > $output_path"
 ```
 

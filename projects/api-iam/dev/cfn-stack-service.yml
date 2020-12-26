@@ -24,7 +24,7 @@ Resources:
   IAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../modules/ecs/iam.yml
+      TemplateURL: ../../../modules/ecs/iam.yml
       Parameters:
         ProjectName: !Ref ProjectName
         AllowEcsPolicy: !Join [',', !Ref AllowEcsPolicy]
@@ -32,14 +32,14 @@ Resources:
   Foundations:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../modules/ecs/foundations.yml
+      TemplateURL: ../../../modules/ecs/foundations.yml
       Parameters:
         ProjectName: !Ref ProjectName
 
   AppMesh:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../modules/ecs/mesh.yml
+      TemplateURL: ../../../modules/ecs/mesh.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ContainerPort: !Ref ContainerPort
@@ -49,7 +49,7 @@ Resources:
   TaskDefinitions:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: .task-definitions.yml
+      TemplateURL: ./.task-definitions.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ContainerName: !Ref ContainerName
@@ -66,7 +66,7 @@ Resources:
   Service:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../modules/ecs/services/internal.yml
+      TemplateURL: ../../../modules/ecs/services/internal.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ClusterArn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
