@@ -26,7 +26,7 @@ sh artifacts/cloudformation.sh
 sh initialize/cloudformation.sh -e dev -p base
 ```
 
-## Provisioning Products
+## Product Base
 
 ```
 sh initialize/cloudformation.sh -e dev -p platform

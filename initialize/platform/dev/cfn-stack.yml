@@ -9,6 +9,8 @@ Parameters:
     Type: String
   DomainName:
     Type: String
+  PrivateNamespace:
+    Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
   PublicSubnets:
@@ -28,8 +30,18 @@ Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../vpc.yml
+      TemplateURL: ../../../modules/base/vpc.yml
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
+        VpcId: !Ref VpcId
+
+  ECS:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../../modules/base/ecs.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        PrivateNamespace: !Ref PrivateNamespace
         VpcId: !Ref VpcId

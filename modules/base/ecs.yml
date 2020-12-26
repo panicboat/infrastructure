@@ -5,12 +5,10 @@ Parameters:
     Type: String
   ProductName:
     Type: String
-  ProjectName:
+  PrivateNamespace:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
-  PrivateNamespace:
-    Type: String
 
 Resources:
   Cluster:
