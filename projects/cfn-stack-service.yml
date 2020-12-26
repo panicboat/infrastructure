@@ -51,7 +51,7 @@ Resources:
   TaskDefinitions:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./task-definitions.yml
+      TemplateURL: ../tmp/task-definitions.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ContainerName: !Ref ContainerName
