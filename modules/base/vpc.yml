@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
-    Type: String
   ProductName:
     Type: String
   VpcId:
@@ -14,8 +12,8 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref ProductName
-      GroupName: !Ref ProductName
+          Value: !Sub ${ProductName}-sg
+      GroupName: !Sub ${ProductName}-sg
       GroupDescription: !Sub Allows traffic between ${ProductName} resources.
       VpcId: !Ref VpcId
 

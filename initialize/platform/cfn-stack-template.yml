@@ -28,7 +28,6 @@ Resources:
     Properties:
       TemplateURL: ../../modules/base/vpc.yml
       Parameters:
-        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
 
@@ -37,7 +36,6 @@ Resources:
     Properties:
       TemplateURL: ../../modules/base/ecs.yml
       Parameters:
-        PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         PrivateNamespace: !Ref PrivateNamespace
         VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }

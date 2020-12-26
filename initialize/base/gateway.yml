@@ -21,7 +21,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref PlatformName
+          Value: !Sub ${PlatformName}-igw
 
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -39,7 +39,7 @@ Resources:
       SubnetId: !Ref PublicSubnetA
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-natgateway-a
+          Value: !Sub ${PlatformName}-ngw-a
 
   EipA:
     Type: AWS::EC2::EIP
@@ -53,7 +53,7 @@ Resources:
       SubnetId: !Ref PublicSubnetC
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-natgateway-c
+          Value: !Sub ${PlatformName}-ngw-c
 
   EipC:
     Type: AWS::EC2::EIP
@@ -67,7 +67,7 @@ Resources:
       SubnetId: !Ref PublicSubnetD
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-natgateway-d
+          Value: !Sub ${PlatformName}-ngw-d
 
   EipD:
     Type: AWS::EC2::EIP

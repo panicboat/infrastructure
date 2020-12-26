@@ -36,7 +36,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-public-a
+          Value: !Sub ${PlatformName}-public-subnet-a
       VpcId: !Ref VpcId
 
   PublicSubnetC:
@@ -47,7 +47,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-public-c
+          Value: !Sub ${PlatformName}-public-subnet-c
       VpcId: !Ref VpcId
 
   PublicSubnetD:
@@ -58,7 +58,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-public-d
+          Value: !Sub ${PlatformName}-public-subnet-d
       VpcId: !Ref VpcId
 
   # --------------------------------------------------
@@ -71,7 +71,7 @@ Resources:
       CidrBlock: !Ref ProtectCidrA
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-protect-a
+          Value: !Sub ${PlatformName}-protect-subnet-a
       VpcId: !Ref VpcId
 
   ProtectSubnetC:
@@ -81,7 +81,7 @@ Resources:
       CidrBlock: !Ref ProtectCidrC
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-protect-c
+          Value: !Sub ${PlatformName}-protect-subnet-c
       VpcId: !Ref VpcId
 
   ProtectSubnetD:
@@ -91,7 +91,7 @@ Resources:
       CidrBlock: !Ref ProtectCidrD
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-protect-d
+          Value: !Sub ${PlatformName}-protect-subnet-d
       VpcId: !Ref VpcId
 
   # --------------------------------------------------
@@ -104,7 +104,7 @@ Resources:
       CidrBlock: !Ref PrivateCidrA
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-private-a
+          Value: !Sub ${PlatformName}-private-subnet-a
       VpcId: !Ref VpcId
 
   PrivateSubnetC:
@@ -114,7 +114,7 @@ Resources:
       CidrBlock: !Ref PrivateCidrC
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-private-c
+          Value: !Sub ${PlatformName}-private-subnet-c
       VpcId: !Ref VpcId
 
   PrivateSubnetD:
@@ -124,7 +124,7 @@ Resources:
       CidrBlock: !Ref PrivateCidrD
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-private-d
+          Value: !Sub ${PlatformName}-private-subnet-d
       VpcId: !Ref VpcId
 
 Outputs:

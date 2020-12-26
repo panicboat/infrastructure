@@ -23,9 +23,9 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-api
-      GroupName: !Sub ${PlatformName}-api
-      GroupDescription: !Sub Allows traffic between ${PlatformName} resources.
+          Value: !Sub ${PlatformName}-internal-sg
+      GroupName: !Sub ${PlatformName}-internal-sg
+      GroupDescription: !Sub Allows internal traffic between ${PlatformName} resources.
       VpcId: !Ref Vpc
 
   SecurityGroupIngress:
@@ -40,8 +40,8 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref PlatformName
-      GroupName: !Ref PlatformName
+          Value: !Ref ${PlatformName}-public-sg
+      GroupName: !Ref ${PlatformName}-public-sg
       GroupDescription: !Sub Allows public traffic for ${PlatformName}.
       VpcId: !Ref Vpc
 
