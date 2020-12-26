@@ -10,16 +10,16 @@ Parameters:
     Type: Number
   DesiredCount:
     Type: Number
-  TaskDefinitionArn:
-    Type: String
-  Priority:
-    Type: Number
   PathPattern:
     Type: CommaDelimitedList
-  VpcId:
-    Type: AWS::EC2::VPC::Id
+  Priority:
+    Type: Number
   ProtectSubnets:
     Type: List<AWS::EC2::Subnet::Id>
+  TaskDefinitionArn:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
 
 Resources:
   TargetGroup:
