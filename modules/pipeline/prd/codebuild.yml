@@ -1,1 +1,88 @@
 AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProjectName:
+    Type: String
+  CICredentialArn:
+    Type: String
+  GitHubOwner:
+    Type: String
+  GitHubRepository:
+    Type: String
+  ProtectSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  ReleaseVersion:
+    Type: String
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  Docker:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${ProjectName}-build
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: True
+        EnvironmentVariables:
+          - Name: REPOSITORY_URI
+            Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ProjectName}"
+          - Name: CONTAINER_NAME
+            Value: !Ref ContainerName
+          - Name: RELEASE_VERSION
+            Value: !Ref ReleaseVersion
+          - Name: GITHUB_OWNER
+            Value: !Ref GitHubOwner
+          - Name: GITHUB_PROJECT
+            Value: !Ref GitHubRepository
+      ServiceRole: !Ref CodeBuildRole
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Join [
+          "\n",
+          [
+            "version: 0.2",
+            "",
+            "env:",
+            "  variables:",
+            "    DOCKER_BUILDKIT: \"1\"",
+            "  secrets-manager:",
+      !Sub  "    GITHUB_TOKEN: \"${CICredentialArn}:GitHubPersonalAccessToken\"",
+      !Sub  "    DOCKERHUB_ID: \"${CICredentialArn}:DockerHubID\"",
+      !Sub  "    DOCKERHUB_PASSWORD: \"${CICredentialArn}:DockerHubPassword\"",
+            "",
+            "phases:",
+            "  pre_build:",
+            "    commands:",
+            "      - echo Logging in to Amazon ECR...",
+            "      - aws --version",
+            "      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)",
+            "      - IMAGE_TAG=`curl -X GET -H \"Authorization:token ${GITHUB_TOKEN}\" https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_PROJECT}/releases | jq -r '. | select(.[0].tag_name | startswith(\"'$RELEASE_VERSION'\"))' | jq -r .[0].tag_name`",
+            "  post_build:",
+            "    commands:",
+            "      - echo Writing image definitions file...",
+            "      - echo \"[{\\\"name\\\":\\\"${CONTAINER_NAME}\\\",\\\"imageUri\\\":\\\"${REPOSITORY_URI}:${IMAGE_TAG}\\\"}]\" > imagedefinitions.json",
+            "artifacts:",
+            "  files: imagedefinitions.json",
+            ""
+          ]
+        ]
+      # VpcConfig:
+      #   VpcId: !Ref VpcId
+      #   Subnets: !Ref ProtectSubnets
+      #   SecurityGroupIds: !Ref SecurityGroups
+      TimeoutInMinutes: 30
+      Cache:
+        Type: LOCAL
+        Modes:
+          - LOCAL_DOCKER_LAYER_CACHE
+
+Outputs:
+  DockerBuild:
+    Value: !Ref Docker

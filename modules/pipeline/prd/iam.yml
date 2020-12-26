@@ -7,7 +7,7 @@
           - Effect: Allow
             Principal:
               AWS:
-                - !Join [':', ['arn:aws:iam:', !Ref 'AWS::AccountId', 'root']]
+                - !Join [':', ['arn:aws:iam:', !Ref 'AWS::AccountId', 'root']] # AWS::AccountIdでは開発アカウントIDを使う
             Action:
               - sts:AssumeRole
       ManagedPolicyArns:

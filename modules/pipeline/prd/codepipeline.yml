@@ -1,1 +1,207 @@
 AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProjectName:
+    Type: String
+  ReleaseVersion:
+    Type: String
+  Cluster:
+    Type: String
+    Default: ''
+  Service:
+    Type: String
+    Default: ''
+  Provisioning:
+    Type: String
+    Default: ''
+  EcrRepository:
+    Type: String
+  AfterBuilds:
+    Type: CommaDelimitedList
+  AfterReleases:
+    Type: CommaDelimitedList
+  SlackChannelConfiguration:
+    Type: String
+
+Conditions:
+  UseSlackNotify: !Not [!Equals [!Ref SlackChannelConfiguration, '']]
+
+Resources:
+  CodePipelineEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+          - aws.ecr
+        detail:
+          eventName:
+            - PutImage
+          requestParameters:
+            repositoryName:
+              - !Ref EcrRepository
+            imageTag:
+              - !Ref ReleaseVersion
+      Targets:
+        - Arn: !Join [':', ['arn:aws:codepipeline', !Ref 'AWS::Region', !Ref 'AWS::AccountId', !Ref CodePipeline]]
+          RoleArn: {'Fn::ImportValue': !Join [':', [!Ref ProjectName, CodePipelineEventRoleArn]]}
+          Id: !Ref ProjectName
+      Name: !Ref ProjectName
+
+  CodePipelineNotificationRule:
+    Type: AWS::CodeStarNotifications::NotificationRule
+    Condition: UseSlackNotify
+    Properties:
+      DetailType: FULL
+      Resource: !Join [':', ['arn:aws:codepipeline', !Ref 'AWS::Region', !Ref 'AWS::AccountId', !Ref CodePipeline]]
+      EventTypeIds:
+        # aws codestar-notifications list-event-types --filters Name=SERVICE_NAME,Value=CodePipeline | jq -r '.'
+        - codepipeline-pipeline-pipeline-execution-succeeded
+        - codepipeline-pipeline-pipeline-execution-failed
+      Targets:
+        - TargetType: AWSChatbotSlack
+          TargetAddress: !Ref SlackChannelConfiguration
+      Name: !Ref ProjectName
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Location: {'Fn::ImportValue': !Join [':', [!Ref ProjectName, S3Bucket]]}
+        Type: S3
+      Name: !Ref ProjectName
+      RestartExecutionOnUpdate: false
+      RoleArn: {'Fn::ImportValue': !Join [':', [!Ref ProjectName, CodePipelineRoleArn]]}
+      Stages: |
+          #!PyPlate
+          output = []
+          output.append({
+            "Name": "Source",
+            "Actions": [{
+              "Name": "SourceImage",
+              "ActionTypeId": {
+                "Category": "Source",
+                "Owner": "AWS",
+                "Version": "1",
+                "Provider": "ECR"
+              },
+              "Configuration": {
+                "ImageTag": params['ReleaseVersion'],
+                "RepositoryName": params['EcrRepository']
+              },
+              "OutputArtifacts": [{
+                "Name": "SourceImage"
+              }],
+              "RunOrder": 1
+            }]
+          })
+          output.append({
+            "Name": "Build",
+            "Actions": [{
+              "Name": "CodeBuild",
+              "InputArtifacts": [{
+                "Name": "SourceImage"
+              }],
+              "ActionTypeId": {
+                "Category": "Build",
+                "Owner": "AWS",
+                "Version": "1",
+                "Provider": "CodeBuild"
+              },
+              "Configuration": {
+                "ProjectName": {
+                  "Fn::ImportValue": params['ProjectName'] + ":AppBuildProject"
+                }
+              },
+              "OutputArtifacts": [{
+                "Name": "BuildImage"
+              }],
+              "RunOrder": 1
+            }]
+          })
+          for project in params['AfterBuilds']:
+            if 0 < len(project):
+              output.append({
+                "Name": project,
+                "Actions": [{
+                  "Name": "CodeBuild",
+                  "InputArtifacts": [{
+                    "Name": "SourceImage"
+                  }],
+                  "ActionTypeId": {
+                    "Category": "Build",
+                    "Owner": "AWS",
+                    "Version": "1",
+                    "Provider": "CodeBuild"
+                  },
+                  "Configuration": {
+                    "ProjectName": project
+                  },
+                  "RunOrder": 1
+                }]
+              })
+          if 0 < len(params['Provisioning']):
+            output.append({
+              "Name": "Provisioning",
+              "Actions": [{
+                "Name": "CodeBuild",
+                "InputArtifacts": [{
+                  "Name": "BuildImage"
+                }],
+                "ActionTypeId": {
+                  "Category": "Build",
+                  "Owner": "AWS",
+                  "Version": "1",
+                  "Provider": "CodeBuild"
+                },
+                "Configuration": {
+                  "ProjectName": {
+                    "Fn::ImportValue": params['ProjectName'] + ":ProvisioningProject"
+                  }
+                },
+                "RunOrder": 1
+              }]
+            })
+          if 0 < len(params['Service']):
+            output.append({
+              "Name": "Deploy",
+              "Actions": [{
+                "Name": "Deploy",
+                "InputArtifacts": [{
+                  "Name": "BuildImage"
+                }],
+                "ActionTypeId": {
+                  "Category": "Deploy",
+                  "Owner": "AWS",
+                  "Version": "1",
+                  "Provider": "ECS"
+                },
+                "Configuration": {
+                  "ClusterName": params['Cluster'],
+                  "FileName": "imagedefinitions.json",
+                  "ServiceName": params['Service']
+                },
+                "RunOrder": 1
+              }]
+            })
+          for project in params['AfterReleases']:
+            if 0 < len(project):
+              output.append({
+                "Name": project,
+                "Actions": [{
+                  "Name": "CodeBuild",
+                  "InputArtifacts": [{
+                    "Name": "BuildImage"
+                  }],
+                  "ActionTypeId": {
+                    "Category": "Build",
+                    "Owner": "AWS",
+                    "Version": "1",
+                    "Provider": "CodeBuild"
+                  },
+                  "Configuration": {
+                    "ProjectName": project
+                  },
+                  "RunOrder": 1
+                }]
+              })
+Transform: [PyPlate]
