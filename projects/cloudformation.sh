@@ -66,7 +66,7 @@ product=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '.ProductName'`
 # ------------------------------------------------------------------------------------------------------
 artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$platform':ArtifactBucket")) | .Value'`
 aws cloudformation package \
-    --template-file $SCRIPT_DIR/cfn-stack-$template.yml \
+    --template-file $SCRIPT_DIR/$project/$env/cfn-stack-$template.yml \
     --s3-bucket $artifact_bucket \
     --s3-prefix cloudformation/projects/$project \
     --output-template-file $SCRIPT_DIR/$project/$env/.cfn-stack-$template.yml
