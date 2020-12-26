@@ -84,10 +84,10 @@ Resources:
             Timeout: 2
             Retries: 3
           User: 1337
-          # Ulimits:
-          #   - Name: nofile
-          #     HardLimit: 15000
-          #     SoftLimit: 15000
+          Ulimits:
+            - Name: nofile
+              HardLimit: 15000
+              SoftLimit: 15000
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -102,8 +102,8 @@ Resources:
               HostPort: 2000
               Protocol: tcp
           User: 1337
-          # Cpu: 32
-          # MemoryReservation: 256
+          Cpu: 32
+          MemoryReservation: 256
           LogConfiguration:
             LogDriver: awslogs
             Options:
