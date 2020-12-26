@@ -3,13 +3,9 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   PlatformName:
     Type: String
-  ProductName:
-    Type: String
-  CallbackURLs:
-    Type: String
   DomainName:
     Type: String
-  PrivateNamespace:
+  HostedZoneId:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -17,31 +13,38 @@ Parameters:
     Type: List<AWS::EC2::Subnet::Id>
 
 Resources:
-  CognitoUserPool:
+  Certificate:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../cognito.yml
+      TemplateURL: ./certificate.yml
       Parameters:
         PlatformName: !Ref PlatformName
-        CallbackURLs: !Ref CallbackURLs
-        CertificateArn: { 'Fn::ImportValue': !Sub "${PlatformName}:CertificateArn" }
         DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./iam.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
 
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/base/vpc.yml
+      TemplateURL: ./vpc.yml
       Parameters:
         PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
         VpcId: !Ref VpcId
 
-  ECS:
+  ElasticLoadBalancer:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/base/ecs.yml
+      TemplateURL: ./elb.yml
       Parameters:
         PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
-        PrivateNamespace: !Ref PrivateNamespace
-        VpcId: !Ref VpcId
+        CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+        PublicSubnets: !Join [',', !Ref PublicSubnets]
+        SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup]]]

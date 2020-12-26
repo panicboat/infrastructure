@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  BuildDirectory:
+    Type: String
+  CICredentialArn:
+    Type: String
+  ContainerName:
+    Type: String
+  ReleaseAccount:
+    Type: String
+  ReleaseVersion:
+    Type: String
+  GitHubOwner:
+    Type: String
+  GitHubRepository:
+    Type: String
+  GitHubBranch:
+    Type: String
+  SlackWorkspaceId:
+    Type: String
+  SlackChannelId:
+    Type: String
+
+Resources:
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../../modules/codepipeline/iam.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+
+  Foundations:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../../modules/codepipeline/foundations.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        SlackWorkspaceId: !Ref SlackWorkspaceId
+        SlackChannelId: !Ref SlackChannelId
+
+  CodeBuild:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../../modules/codepipeline/dev/codebuild.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        BuildDirectory: !Ref BuildDirectory
+        ContainerName: !Ref ContainerName
+        CICredentialArn: !Ref CICredentialArn
+        GitHubOwner: !Ref GitHubOwner
+        GitHubRepository: !Ref GitHubRepository
+        GitHubBranch: !Ref GitHubBranch
+        ReleaseAccount: !Ref ReleaseAccount
+        ReleaseVersion: !Ref ReleaseVersion
+        VpcId: !Ref VpcId
+        ProtectedSubnets: !Join [',', !Ref ProtectedSubnets]
+        CodeBuildRole: !GetAtt [IAM, Outputs.CodeBuildRole]
+
+  # CodeDeploy:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ../../../modules/codepipeline/codedeploy.yml
+  #     Parameters:
+  #       PlatformName: !Ref PlatformName
+  #       ProductName: !Ref ProductName
+  #       ProjectName: !Ref ProjectName
+
+  CodePipeline:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../../modules/codepipeline/dev/codepipeline.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
+        ProjectName: !Ref ProjectName
+        GitHubOwner: !Ref GitHubOwner
+        GitHubRepository: !Ref GitHubRepository
+        GitHubBranch: !Ref GitHubBranch
+        CICredentialArn: !Ref CICredentialArn
+        SlackChannelConfiguration: !GetAtt [Foundations, Outputs.SlackChannelConfiguration]
+        CodePipelineRoleArn: !GetAtt [IAM, Outputs.CodePipelineRoleArn]
+        DockerBuild: !GetAtt [CodeBuild, Outputs.DockerBuild]
+        GitHubTag: !GetAtt [CodeBuild, Outputs.GitHubTag]
+        Release: !GetAtt [CodeBuild, Outputs.Release]
