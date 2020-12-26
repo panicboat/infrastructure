@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  ProductName:
+    Type: String
+  ProjectName:
+    Type: String
+  BuildDirectory:
+    Type: String
+  CICredentialArn:
+    Type: String
+  ContainerName:
+    Type: String
+  GitHubBranch:
+    Type: String
+  GitHubOwner:
+    Type: String
+  GitHubRepository:
+    Type: String
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  ReleaseAccount:
+    Type: String
+  ReleaseVersion:
+    Type: String
+  SlackChannelId:
+    Type: String
+  SlackWorkspaceId:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/pipeline/iam.yml
+      Parameters:
+        ProjectName: !Ref ProjectName
+
+  Foundations:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/pipeline/foundations.yml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        IamRoleArn: { 'Fn::ImportValue': !Sub "${PlatformName}:ChatbotRoleArn" }
+        SlackChannelId: !Ref SlackChannelId
+        SlackWorkspaceId: !Ref SlackWorkspaceId
+
+  CodeBuild:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/pipeline/dev/codebuild.yml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        BuildDirectory: !Ref BuildDirectory
+        CICredentialArn: !Ref CICredentialArn
+        CodeBuildRole: !GetAtt [IAM, Outputs.CodeBuildRole]
+        ContainerName: !Ref ContainerName
+        GitHubBranch: !Ref GitHubBranch
+        GitHubOwner: !Ref GitHubOwner
+        GitHubRepository: !Ref GitHubRepository
+        ProtectedSubnets: !Join [',', !Ref ProtectedSubnets]
+        ReleaseAccount: !Ref ReleaseAccount
+        ReleaseVersion: !Ref ReleaseVersion
+        SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
+        VpcId: !Ref VpcId
+
+  CodePipeline:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/pipeline/dev/codepipeline.yml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        ArtifactBucket: { 'Fn::ImportValue': !Sub "${PlatformName}:ArtifactBucket" }
+        BuildProject: !GetAtt [CodeBuild, Outputs.DockerBuild]
+        CICredentialArn: !Ref CICredentialArn
+        ClusterName: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterName" }
+        CodePipelineRoleArn: !GetAtt [IAM, Outputs.CodePipelineRoleArn]
+        GitHubBranch: !Ref GitHubBranch
+        GitHubOwner: !Ref GitHubOwner
+        GitHubRepository: !Ref GitHubRepository
+        ReleaseProject: !GetAtt [CodeBuild, Outputs.Release]
+        SlackChannelConfiguration: !GetAtt [Foundations, Outputs.SlackChannelConfiguration]
+        TaggingProject: !GetAtt [CodeBuild, Outputs.GitHubTag]

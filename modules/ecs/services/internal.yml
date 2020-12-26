@@ -1,18 +1,20 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
-    Type: String
-  ProductName:
-    Type: String
   ProjectName:
+    Type: String
+  ClusterArn:
     Type: String
   DesiredCount:
     Type: Number
-  TaskDefinitionArn:
+  NamespaceId:
     Type: String
   ProtectedSubnets:
     Type: List<AWS::EC2::Subnet::Id>
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  TaskDefinitionArn:
+    Type: String
 
 Resources:
   ServiceDiscovery:
@@ -24,20 +26,19 @@ Resources:
         DnsRecords:
           - Type: A
             TTL: 60
-        NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
+        NamespaceId: !Ref NamespaceId
       Name: !Ref ProjectName
 
   Service:
     Type: AWS::ECS::Service
     Properties:
-      Cluster: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
+      Cluster: !Ref ClusterArn
       DesiredCount: !Ref DesiredCount
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED   # TODO: Set to DISABLED when using NAT Gateway
-          SecurityGroups:
-            - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+          SecurityGroups: !Ref SecurityGroups
           Subnets: !Ref ProtectedSubnets
       ServiceName: !Ref ProjectName
       ServiceRegistries:

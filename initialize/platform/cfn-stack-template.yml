@@ -13,8 +13,6 @@ Parameters:
     Type: String
   VpcId:
     Type: AWS::EC2::VPC::Id
-  PublicSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
 
 Resources:
   CognitoUserPool:

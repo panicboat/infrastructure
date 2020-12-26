@@ -53,10 +53,10 @@ platform=`cat $SCRIPT_DIR/$project/$env/params.json | jq -r '.PlatformName'`
 # ------------------------------------------------------------------------------------------------------
 artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$platform':ArtifactBucket")) | .Value'`
 aws cloudformation package \
-    --template-file $SCRIPT_DIR/$project/cfn-stack-initialize.yml \
+    --template-file $SCRIPT_DIR/$project/cfn-stack-template.yml \
     --s3-bucket $artifact_bucket \
     --s3-prefix cloudformation/initialize/$project \
-    --output-template-file $SCRIPT_DIR/$project/$env/.cfn-stack.yml
+    --output-template-file $SCRIPT_DIR/$project/$env/.cfn-stack-template.yml
 if [ $? -ne 0 ]; then
     exit $?
 fi
@@ -65,7 +65,7 @@ fi
 # Deploy
 # ------------------------------------------------------------------------------------------------------
 aws cloudformation deploy \
-    --template-file $SCRIPT_DIR/$project/$env/.cfn-stack.yml \
+    --template-file $SCRIPT_DIR/$project/$env/.cfn-stack-template.yml \
     --stack-name $platform-$project-initialize \
     --parameter-overrides $params $networks \
     --capabilities CAPABILITY_NAMED_IAM

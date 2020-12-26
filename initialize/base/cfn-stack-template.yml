@@ -7,10 +7,10 @@ Parameters:
     Type: String
   HostedZoneId:
     Type: String
-  VpcId:
-    Type: AWS::EC2::VPC::Id
   PublicSubnets:
     Type: List<AWS::EC2::Subnet::Id>
+  VpcId:
+    Type: AWS::EC2::VPC::Id
 
 Resources:
   Certificate:

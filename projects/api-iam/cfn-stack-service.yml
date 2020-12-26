@@ -7,78 +7,73 @@ Parameters:
     Type: String
   ProjectName:
     Type: String
-  ProtectedSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
   AllowEcsPolicy:
     Type: CommaDelimitedList
   ContainerName:
     Type: String
   ContainerPort:
     Type: Number
+  DesiredCount:
+    Type: Number
   TaskCpu:
     Type: Number
   TaskMemory:
     Type: Number
-  DesiredCount:
-    Type: Number
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
 
 Resources:
   IAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/iam.yml
+      TemplateURL: ../../modules/ecs/iam.yml
       Parameters:
-        PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         AllowEcsPolicy: !Join [',', !Ref AllowEcsPolicy]
 
   Foundations:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/foundations.yml
+      TemplateURL: ../../modules/ecs/foundations.yml
       Parameters:
-        PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
 
   AppMesh:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/mesh/internal.yml
+      TemplateURL: ../../modules/ecs/mesh.yml
       Parameters:
-        PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         ContainerPort: !Ref ContainerPort
+        MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+        PrivateNamespace: { 'Fn::ImportValue': !Sub "${ProductName}:PrivateNamespace" }
 
   TaskDefinitions:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/tasks/internal.yml
+      TemplateURL: ../../modules/ecs/tasks/internal.yml
       Parameters:
-        PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
         ContainerName: !Ref ContainerName
         ContainerPort: !Ref ContainerPort
-        TaskCpu: !Ref TaskCpu
-        TaskMemory: !Ref TaskMemory
         EcsTaskExecutionRoleArn: !GetAtt [IAM, Outputs.EcsTaskExecutionRole]
         EcsTaskRoleArn: !GetAtt [IAM, Outputs.EcsTaskRoleArn]
-        RepositoryURI: !GetAtt [Foundations, Outputs.RepositoryURI]
         LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
+        RepositoryURI: !GetAtt [Foundations, Outputs.RepositoryURI]
+        TaskCpu: !Ref TaskCpu
+        TaskMemory: !Ref TaskMemory
         VirtualNodeName: !GetAtt [AppMesh, Outputs.VirtualNodeName]
         VirtualNodeArn: !GetAtt [AppMesh, Outputs.VirtualNodeArn]
 
   Service:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/services/internal.yml
+      TemplateURL: ../../modules/ecs/services/internal.yml
       Parameters:
-        PlatformName: !Ref PlatformName
-        ProductName: !Ref ProductName
         ProjectName: !Ref ProjectName
+        ClusterArn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
         DesiredCount: !Ref DesiredCount
-        TaskDefinitionArn: !GetAtt [TaskDefinitions, Outputs.TaskDefinitionArn]
+        NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
         ProtectedSubnets: !Join [',', !Ref ProtectedSubnets]
+        SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
+        TaskDefinitionArn: !GetAtt [TaskDefinitions, Outputs.TaskDefinitionArn]

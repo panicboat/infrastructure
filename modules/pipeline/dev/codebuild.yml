@@ -1,34 +1,32 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
-    Type: String
-  ProductName:
-    Type: String
   ProjectName:
+    Type: String
+  BuildDirectory:
+    Type: String
+  CICredentialArn:
+    Type: String
+  CodeBuildRole:
+    Type: String
+  ContainerName:
+    Type: String
+  GitHubBranch:
     Type: String
   GitHubOwner:
     Type: String
   GitHubRepository:
     Type: String
-  GitHubBranch:
+  ProtectedSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  ReleaseAccount:
     Type: String
   ReleaseVersion:
     Type: String
-  ReleaseAccount:
-    Type: String
-  ContainerName:
-    Type: String
-  BuildDirectory:
-    Type: String
-  CodeBuildRole:
-    Type: String
-  CICredentialArn:
-    Type: String
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
   VpcId:
     Type: AWS::EC2::VPC::Id
-  ProtectedSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
 
 Resources:
   Docker:
@@ -93,12 +91,10 @@ Resources:
               ""
             ]
           ]
-      # TODO: Uncomment if using NAT gateway
       # VpcConfig:
       #   VpcId: !Ref VpcId
       #   Subnets: !Ref ProtectedSubnets
-      #   SecurityGroupIds:
-      #     - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+      #   SecurityGroupIds: !Ref SecurityGroups
       TimeoutInMinutes: 30
       Cache:
         Type: LOCAL
@@ -160,12 +156,10 @@ Resources:
               "      - curl -X POST -H \"$authorization\" -H \"$content_type\" -d \"$params\" https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_PROJECT}/releases",
             ]
           ]
-      # TODO: Uncomment if using NAT gateway
       # VpcConfig:
       #   VpcId: !Ref VpcId
       #   Subnets: !Ref ProtectedSubnets
-      #   SecurityGroupIds:
-      #     - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+      #   SecurityGroupIds: !Ref SecurityGroups
       TimeoutInMinutes: 30
 
   Release:
@@ -251,8 +245,7 @@ Resources:
       # VpcConfig:
       #   VpcId: !Ref VpcId
       #   Subnets: !Ref ProtectedSubnets
-      #   SecurityGroupIds:
-      #     - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+      #   SecurityGroupIds: !Ref SecurityGroups
       TimeoutInMinutes: 30
 
 Outputs:

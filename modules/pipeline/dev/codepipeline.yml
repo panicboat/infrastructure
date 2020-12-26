@@ -1,29 +1,29 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
-    Type: String
-  ProductName:
-    Type: String
   ProjectName:
+    Type: String
+  ArtifactBucket:
+    Type: String
+  BuildProject:
+    Type: String
+  CICredentialArn:
+    Type: String
+  ClusterName:
+    Type: String
+  CodePipelineRoleArn:
+    Type: String
+  GitHubBranch:
     Type: String
   GitHubOwner:
     Type: String
   GitHubRepository:
     Type: String
-  GitHubBranch:
-    Type: String
-  CICredentialArn:
+  ReleaseProject:
     Type: String
   SlackChannelConfiguration:
     Type: String
-  CodePipelineRoleArn:
-    Type: String
-  DockerBuild:
-    Type: String
-  GitHubTag:
-    Type: String
-  Release:
+  TaggingProject:
     Type: String
 
 Resources:
@@ -45,7 +45,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       ArtifactStore:
-        Location: { 'Fn::ImportValue': !Sub "${PlatformName}:ArtifactBucket" }
+        Location: !Ref ArtifactBucket
         Type: S3
       Name: !Ref ProjectName
       RestartExecutionOnUpdate: false
@@ -78,7 +78,7 @@ Resources:
                 Provider: CodeBuild
                 Version: 1
               Configuration:
-                ProjectName: !Ref DockerBuild
+                ProjectName: !Ref BuildProject
               OutputArtifacts:
                 - Name: BuildImage
               RunOrder: 1
@@ -93,7 +93,7 @@ Resources:
                 Provider: ECS
                 Version: 1
               Configuration:
-                ClusterName: !Ref ProductName
+                ClusterName: !Ref ClusterName
                 FileName: imagedefinitions.json
                 ServiceName: !Ref ProjectName
               OutputArtifacts: []
@@ -118,7 +118,7 @@ Resources:
                 Provider: CodeBuild
                 Version: 1
               Configuration:
-                ProjectName: !Ref GitHubTag
+                ProjectName: !Ref TaggingProject
               RunOrder: 1
             - Name: Release
               InputArtifacts:
@@ -129,5 +129,5 @@ Resources:
                 Provider: CodeBuild
                 Version: 1
               Configuration:
-                ProjectName: !Ref Release
+                ProjectName: !Ref ReleaseProject
               RunOrder: 2

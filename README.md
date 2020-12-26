@@ -35,11 +35,11 @@ sh initialize/cloudformation.sh -e dev -p platform
 ## Project Service
 
 ```bash
-sh products/cloudformation.sh -e dev -p api-iam -t service
+sh projects/cloudformation.sh -e dev -p api-iam -t service
 ```
 
 ## Project Pipeline
 
 ```bash
-sh products/cloudformation.sh -e dev -p api-iam -t pipeline
+sh projects/cloudformation.sh -e dev -p api-iam -t pipeline
 ```

@@ -1,28 +1,24 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
-    Type: String
-  ProductName:
-    Type: String
   ProjectName:
     Type: String
   ContainerName:
     Type: String
   ContainerPort:
     Type: Number
-  TaskCpu:
-    Type: Number
-  TaskMemory:
-    Type: Number
   EcsTaskExecutionRoleArn:
     Type: String
   EcsTaskRoleArn:
     Type: String
-  RepositoryURI:
-    Type: String
   LogGroup:
     Type: String
+  RepositoryURI:
+    Type: String
+  TaskCpu:
+    Type: Number
+  TaskMemory:
+    Type: Number
   VirtualNodeName:
     Type: String
   VirtualNodeArn:

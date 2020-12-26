@@ -1,21 +1,21 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
-    Type: String
-  ProductName:
-    Type: String
   ProjectName:
     Type: String
   ContainerPort:
     Type: Number
+  MeshName:
+    Type: String
+  PrivateNamespace:
+    Type: String
 
 Resources:
   VirtualService:
     Type: AWS::AppMesh::VirtualService
     Properties:
-      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
-      VirtualServiceName: !Join ['.', [!Ref ProjectName, { 'Fn::ImportValue': !Sub "${ProductName}:PrivateNamespace" }]]
+      MeshName: !Ref MeshName
+      VirtualServiceName: !Sub ${ProjectName}.${PrivateNamespace}
       Spec:
         Provider:
           VirtualRouter:
@@ -24,7 +24,7 @@ Resources:
   VirtualRouter:
     Type: AWS::AppMesh::VirtualRouter
     Properties:
-      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+      MeshName: !Ref MeshName
       VirtualRouterName: !Ref ProjectName
       Spec:
         Listeners:
@@ -35,7 +35,7 @@ Resources:
   Route:
     Type: AWS::AppMesh::Route
     Properties:
-      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+      MeshName: !Ref MeshName
       VirtualRouterName: !GetAtt VirtualRouter.VirtualRouterName
       RouteName: !Ref ProjectName
       Spec:
@@ -50,7 +50,7 @@ Resources:
   VirtualNode:
     Type: AWS::AppMesh::VirtualNode
     Properties:
-      MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+      MeshName: !Ref MeshName
       VirtualNodeName: !Ref ProjectName
       Spec:
         Listeners:
@@ -66,7 +66,7 @@ Resources:
               IntervalMillis: 5000
         ServiceDiscovery:
           DNS:
-            Hostname: !Join ['.', [!Ref ProjectName, { 'Fn::ImportValue': !Sub "${ProductName}:PrivateNamespace" }]]
+            Hostname: !Sub ${ProjectName}.${PrivateNamespace}
 
 Outputs:
   VirtualNodeArn:
