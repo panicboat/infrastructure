@@ -10,7 +10,7 @@ Parameters:
     Type: Number
   TaskDefinitionArn:
     Type: String
-  ProtectedSubnets:
+  ProtectSubnets:
     Type: List<AWS::EC2::Subnet::Id>
 
 Resources:
@@ -34,7 +34,7 @@ Resources:
                 AssignPublicIp: DISABLED
                 SecurityGroups:
                   - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
-                Subnets: !Ref ProtectedSubnets
+                Subnets: !Ref ProtectSubnets
           Input: !Join [
             '',
             [

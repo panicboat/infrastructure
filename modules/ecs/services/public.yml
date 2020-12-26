@@ -18,7 +18,7 @@ Parameters:
     Type: CommaDelimitedList
   VpcId:
     Type: AWS::EC2::VPC::Id
-  ProtectedSubnets:
+  ProtectSubnets:
     Type: List<AWS::EC2::Subnet::Id>
 
 Resources:
@@ -66,6 +66,6 @@ Resources:
           AssignPublicIp: DISABLED
           SecurityGroups:
             - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
-          Subnets: !Ref ProtectedSubnets
+          Subnets: !Ref ProtectSubnets
       ServiceName: !Ref ProjectName
       TaskDefinition: !Ref TaskDefinitionArn

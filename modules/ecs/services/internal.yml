@@ -9,7 +9,7 @@ Parameters:
     Type: Number
   NamespaceId:
     Type: String
-  ProtectedSubnets:
+  ProtectSubnets:
     Type: List<AWS::EC2::Subnet::Id>
   SecurityGroups:
     Type: List<AWS::EC2::SecurityGroup::Id>
@@ -39,7 +39,7 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED   # TODO: Set to DISABLED when using NAT Gateway
           SecurityGroups: !Ref SecurityGroups
-          Subnets: !Ref ProtectedSubnets
+          Subnets: !Ref ProtectSubnets
       ServiceName: !Ref ProjectName
       ServiceRegistries:
         - RegistryArn: !GetAtt ServiceDiscovery.Arn

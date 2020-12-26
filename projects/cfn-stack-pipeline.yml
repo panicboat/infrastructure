@@ -59,7 +59,7 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubOwner: !Ref GitHubOwner
         GitHubRepository: !Ref GitHubRepository
-        ProtectedSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetD"}]]
+        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetD"}]]
         ReleaseAccount: !Ref ReleaseAccount
         ReleaseVersion: !Ref ReleaseVersion
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]

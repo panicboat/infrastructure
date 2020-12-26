@@ -72,6 +72,6 @@ Resources:
         ClusterArn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
         DesiredCount: !Ref DesiredCount
         NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
-        ProtectedSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetD"}]]
+        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
         TaskDefinitionArn: !GetAtt [TaskDefinitions, Outputs.TaskDefinitionArn]
