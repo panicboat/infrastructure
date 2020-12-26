@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PlatformName:
+    Type: String
+  PrivateCidrA:
+    Type: String
+  PrivateCidrC:
+    Type: String
+  PrivateCidrD:
+    Type: String
+  ProtectCidrA:
+    Type: String
+  ProtectCidrC:
+    Type: String
+  ProtectCidrD:
+    Type: String
+  PublicCidrA:
+    Type: String
+  PublicCidrC:
+    Type: String
+  PublicCidrD:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  # --------------------------------------------------
+  # AWS::EC2::Subnet for Public
+  # --------------------------------------------------
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: !Ref PublicCidrA
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-public-a
+      VpcId: !Ref VpcId
+
+  PublicSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: !Ref PublicCidrC
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-public-c
+      VpcId: !Ref VpcId
+
+  PublicSubnetD:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1d
+      CidrBlock: !Ref PublicCidrD
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-public-d
+      VpcId: !Ref VpcId
+
+  # --------------------------------------------------
+  # AWS::EC2::Subnet for Protect
+  # --------------------------------------------------
+  ProtectSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: !Ref ProtectCidrA
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-protect-a
+      VpcId: !Ref VpcId
+
+  ProtectSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: !Ref ProtectCidrC
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-protect-c
+      VpcId: !Ref VpcId
+
+  ProtectSubnetD:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1d
+      CidrBlock: !Ref ProtectCidrD
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-protect-d
+      VpcId: !Ref VpcId
+
+  # --------------------------------------------------
+  # AWS::EC2::Subnet for Private
+  # --------------------------------------------------
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: !Ref PrivateCidrA
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-private-a
+      VpcId: !Ref VpcId
+
+  PrivateSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: !Ref PrivateCidrC
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-private-c
+      VpcId: !Ref VpcId
+
+  PrivateSubnetD:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1d
+      CidrBlock: !Ref PrivateCidrD
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-private-d
+      VpcId: !Ref VpcId
+
+Outputs:
+  PublicSubnetA:
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: !Sub ${PlatformName}:PublicSubnetA
+
+  PublicSubnetC:
+    Value: !Ref PublicSubnetC
+    Export:
+      Name: !Sub ${PlatformName}:PublicSubnetC
+
+  PublicSubnetD:
+    Value: !Ref PublicSubnetD
+    Export:
+      Name: !Sub ${PlatformName}:PublicSubnetD
+
+  ProtectSubnetA:
+    Value: !Ref ProtectSubnetA
+    Export:
+      Name: !Sub ${PlatformName}:ProtectSubnetA
+
+  ProtectSubnetC:
+    Value: !Ref ProtectSubnetC
+    Export:
+      Name: !Sub ${PlatformName}:ProtectSubnetC
+
+  ProtectSubnetD:
+    Value: !Ref ProtectSubnetD
+    Export:
+      Name: !Sub ${PlatformName}:ProtectSubnetD
+
+  PrivateSubnetA:
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: !Sub ${PlatformName}:PrivateSubnetA
+
+  PrivateSubnetC:
+    Value: !Ref PrivateSubnetC
+    Export:
+      Name: !Sub ${PlatformName}:PrivateSubnetC
+
+  PrivateSubnetD:
+    Value: !Ref PrivateSubnetD
+    Export:
+      Name: !Sub ${PlatformName}:PrivateSubnetD

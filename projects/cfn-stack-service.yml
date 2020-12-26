@@ -19,8 +19,6 @@ Parameters:
     Type: Number
   TaskMemory:
     Type: Number
-  ProtectedSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
 
 Resources:
   IAM:
@@ -51,7 +49,7 @@ Resources:
   TaskDefinitions:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../tmp/task-definitions.yml
+      TemplateURL: .task-definitions.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ContainerName: !Ref ContainerName
@@ -74,6 +72,6 @@ Resources:
         ClusterArn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
         DesiredCount: !Ref DesiredCount
         NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
-        ProtectedSubnets: !Join [',', !Ref ProtectedSubnets]
+        ProtectedSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetD"}]]
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
         TaskDefinitionArn: !GetAtt [TaskDefinitions, Outputs.TaskDefinitionArn]

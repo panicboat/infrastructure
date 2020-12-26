@@ -19,8 +19,6 @@ Parameters:
     Type: String
   GitHubRepository:
     Type: String
-  ProtectedSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
   ReleaseAccount:
     Type: String
   ReleaseVersion:
@@ -29,8 +27,6 @@ Parameters:
     Type: String
   SlackWorkspaceId:
     Type: String
-  VpcId:
-    Type: AWS::EC2::VPC::Id
 
 Resources:
   IAM:
@@ -63,11 +59,11 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubOwner: !Ref GitHubOwner
         GitHubRepository: !Ref GitHubRepository
-        ProtectedSubnets: !Join [',', !Ref ProtectedSubnets]
+        ProtectedSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetD"}]]
         ReleaseAccount: !Ref ReleaseAccount
         ReleaseVersion: !Ref ReleaseVersion
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
-        VpcId: !Ref VpcId
+        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
 
   CodePipeline:
     Type: AWS::CloudFormation::Stack

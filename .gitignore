@@ -1,2 +1,2 @@
 .cfn-stack*.yml
-tmp
+.task-definitions.yml

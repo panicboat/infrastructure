@@ -44,7 +44,6 @@ fi
 # ------------------------------------------------------------------------------------------------------
 # Parameters
 # ------------------------------------------------------------------------------------------------------
-networks=`cat $SCRIPT_DIR/../resources/$env/networks.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
 params=`cat $SCRIPT_DIR/$project/$env/params.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
 platform=`cat $SCRIPT_DIR/$project/$env/params.json | jq -r '.PlatformName'`
 
@@ -67,7 +66,7 @@ fi
 aws cloudformation deploy \
     --template-file $SCRIPT_DIR/$project/$env/.cfn-stack-template.yml \
     --stack-name $platform-$project-initialize \
-    --parameter-overrides $params $networks \
+    --parameter-overrides $params \
     --capabilities CAPABILITY_NAMED_IAM
 if [ $? -ne 0 ]; then
     exit $?

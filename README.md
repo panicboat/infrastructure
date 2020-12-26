@@ -6,9 +6,10 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Require
 
-Register in AWS Secrets Manager.
+- Your domain is registered with Route 53
 
-```
+- The `CICredential` are registered in AWS Secrets Manager.
+```json
 {
   "GitHubAccessToken": "GitHubアクセストークン",
   "GitHubUserName": "GitHubアカウント名",
@@ -21,25 +22,39 @@ Register in AWS Secrets Manager.
 
 ## Initialize ( at once )
 
+1. Create s3 bucket for Artifact.
 ```bash
 sh artifacts/cloudformation.sh
-sh initialize/cloudformation.sh -e dev -p base
+```
+
+2. Deploy initial resources.
+```bash
+sh initialize/cloudformation.sh -e $env -p base
 ```
 
 ## Product Base
 
-```
-sh initialize/cloudformation.sh -e dev -p platform
+```bash
+sh initialize/cloudformation.sh -e $env -p $product
 ```
 
 ## Project Service
 
+1. Create TaskDefinitions.
 ```bash
-sh projects/cloudformation.sh -e dev -p api-iam -t service
+template_path=modules/ecs/task-definitions.yml.erb
+parameter_path=projects/$project/$env/environments.yml
+output_path=projects/.task-definitions.yml
+docker-compose run app bash -c "ruby engine.rb --template $template_path --parameter $parameter_path > $output_path"
+```
+
+2. Deploy Service.
+```bash
+sh projects/cloudformation.sh -e $env -p $project -t service
 ```
 
 ## Project Pipeline
 
 ```bash
-sh projects/cloudformation.sh -e dev -p api-iam -t pipeline
+sh projects/cloudformation.sh -e $env -p $project -t pipeline
 ```

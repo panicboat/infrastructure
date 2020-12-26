@@ -7,10 +7,26 @@ Parameters:
     Type: String
   HostedZoneId:
     Type: String
-  PublicSubnets:
-    Type: List<AWS::EC2::Subnet::Id>
-  VpcId:
-    Type: AWS::EC2::VPC::Id
+  PrivateCidrA:
+    Type: String
+  PrivateCidrC:
+    Type: String
+  PrivateCidrD:
+    Type: String
+  ProtectCidrA:
+    Type: String
+  ProtectCidrC:
+    Type: String
+  ProtectCidrD:
+    Type: String
+  PublicCidrA:
+    Type: String
+  PublicCidrC:
+    Type: String
+  PublicCidrD:
+    Type: String
+  VpcCidrBlock:
+    Type: String
 
 Resources:
   Certificate:
@@ -25,17 +41,66 @@ Resources:
   IAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./iam.yml
+      TemplateURL: iam.yml
       Parameters:
         PlatformName: !Ref PlatformName
 
-  VPC:
+  Vpc:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./vpc.yml
       Parameters:
         PlatformName: !Ref PlatformName
-        VpcId: !Ref VpcId
+        VpcCidrBlock: !Ref VpcCidrBlock
+
+  Subnet:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./subnet.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        PrivateCidrA: !Ref PrivateCidrA
+        PrivateCidrC: !Ref PrivateCidrC
+        PrivateCidrD: !Ref PrivateCidrD
+        ProtectCidrA: !Ref ProtectCidrA
+        ProtectCidrC: !Ref ProtectCidrC
+        ProtectCidrD: !Ref ProtectCidrD
+        PublicCidrA: !Ref PublicCidrA
+        PublicCidrC: !Ref PublicCidrC
+        PublicCidrD: !Ref PublicCidrD
+        VpcId: !GetAtt [Vpc, Outputs.VpcId]
+
+  Gateway:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./gateway.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        PublicSubnetA: !GetAtt [Subnet, Outputs.PublicSubnetA]
+        PublicSubnetC: !GetAtt [Subnet, Outputs.PublicSubnetC]
+        PublicSubnetD: !GetAtt [Subnet, Outputs.PublicSubnetD]
+        VpcId: !GetAtt [Vpc, Outputs.VpcId]
+
+  Route:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./route.yml
+      Parameters:
+        PlatformName: !Ref PlatformName
+        GatewayId: !GetAtt [Gateway, Outputs.InternetGateway]
+        NatGatewayA: !GetAtt [Gateway, Outputs.NatGatewayA]
+        NatGatewayC: !GetAtt [Gateway, Outputs.NatGatewayC]
+        NatGatewayD: !GetAtt [Gateway, Outputs.NatGatewayD]
+        PrivateSubnetA: !GetAtt [Subnet, Outputs.PrivateSubnetA]
+        PrivateSubnetC: !GetAtt [Subnet, Outputs.PrivateSubnetC]
+        PrivateSubnetD: !GetAtt [Subnet, Outputs.PrivateSubnetD]
+        ProtectSubnetA: !GetAtt [Subnet, Outputs.ProtectSubnetA]
+        ProtectSubnetC: !GetAtt [Subnet, Outputs.ProtectSubnetC]
+        ProtectSubnetD: !GetAtt [Subnet, Outputs.ProtectSubnetD]
+        PublicSubnetA: !GetAtt [Subnet, Outputs.PublicSubnetA]
+        PublicSubnetC: !GetAtt [Subnet, Outputs.PublicSubnetC]
+        PublicSubnetD: !GetAtt [Subnet, Outputs.PublicSubnetD]
+        VpcId: !GetAtt [Vpc, Outputs.VpcId]
 
   ElasticLoadBalancer:
     Type: AWS::CloudFormation::Stack
@@ -46,5 +111,5 @@ Resources:
         CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
         DomainName: !Ref DomainName
         HostedZoneId: !Ref HostedZoneId
-        PublicSubnets: !Join [',', !Ref PublicSubnets]
-        SecurityGroups: !Join [',', [!GetAtt [VPC, Outputs.SecurityGroup]]]
+        PublicSubnets: !Join [',', [!GetAtt [Subnet, Outputs.PublicSubnetA], !GetAtt [Subnet, Outputs.PublicSubnetC], !GetAtt [Subnet, Outputs.PublicSubnetD]]]
+        SecurityGroups: !Join [',', [!GetAtt [Vpc, Outputs.SecurityGroupPublic], !GetAtt [Vpc, Outputs.SecurityGroup]]]

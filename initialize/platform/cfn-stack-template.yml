@@ -11,8 +11,6 @@ Parameters:
     Type: String
   PrivateNamespace:
     Type: String
-  VpcId:
-    Type: AWS::EC2::VPC::Id
 
 Resources:
   CognitoUserPool:
@@ -32,7 +30,7 @@ Resources:
       Parameters:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
-        VpcId: !Ref VpcId
+        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
 
   ECS:
     Type: AWS::CloudFormation::Stack
@@ -42,4 +40,4 @@ Resources:
         PlatformName: !Ref PlatformName
         ProductName: !Ref ProductName
         PrivateNamespace: !Ref PrivateNamespace
-        VpcId: !Ref VpcId
+        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
