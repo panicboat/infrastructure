@@ -46,8 +46,10 @@ Resources:
           Environment:
             - Name: TZ
               Value: Asia/Tokyo
-            - Name: RAILS_LOG_TO_STDOUT
-              Value: true
+% p[:Environment].each do |env|
+            - Name: <%= env[:Name] %>
+              Value: <%= env[:Value] %>
+% end
           LogConfiguration:
             LogDriver: awslogs
             Options:
