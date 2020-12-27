@@ -18,37 +18,47 @@ These instructions will get you a copy of the project up and running on your loc
 }
 ```
 
+- [Docker](https://www.docker.com/)
+
+- [fillin](https://github.com/itchyny/fillin)
+
 # Usage
 
 ## Initialize ( at once )
 
 1. Create s3 bucket for Artifact.
 ```bash
-sh artifacts/cloudformation.sh
+fillin sh artifacts/cloudformation.sh
 ```
 
 2. Deploy initial resources.
 ```bash
-sh initialize/cloudformation.sh -e $env -p base
+fillin sh initialize/cloudformation.sh -e {{env}} -p base
 ```
 
 ## Product Base
 
 ```bash
-sh initialize/cloudformation.sh -e $env -p $product
+fillin sh initialize/cloudformation.sh -e {{env}} -p {{product}}
 ```
 
 ## Project Service
 
-1. Create TaskDefinitions.
+1. Set Variables.
+```bash
+fillin project={{project}}
+fillin env={{env}}
+```
+
+2. Create TaskDefinitions.
 ```bash
 template_path=modules/ecs/task-definitions.yml.erb
 parameter_path=projects/$project/$env/environments.yml
-output_path=projects/$project/$env/.task-definitions.yml
+output_path=projects/.task-definitions.yml
 docker-compose run app bash -c "ruby engine.rb --template $template_path --parameter $parameter_path > $output_path"
 ```
 
-2. Deploy Service.
+3. Deploy Service.
 ```bash
 sh projects/cloudformation.sh -e $env -p $project -t service
 ```
@@ -56,5 +66,5 @@ sh projects/cloudformation.sh -e $env -p $project -t service
 ## Project Pipeline
 
 ```bash
-sh projects/cloudformation.sh -e $env -p $project -t pipeline
+fillin sh projects/cloudformation.sh -e {{env}} -p {{project}} -t pipeline
 ```
