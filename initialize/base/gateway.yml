@@ -32,47 +32,47 @@ Resources:
   # --------------------------------------------------
   # AWS::EC2::NatGateway
   # --------------------------------------------------
-  # NatGatewayA:
-  #   Type: AWS::EC2::NatGateway
-  #   Properties:
-  #     AllocationId: !GetAtt EipA.AllocationId
-  #     SubnetId: !Ref PublicSubnetA
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${PlatformName}-ngw-a
+  NatGatewayA:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EipA.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-ngw-a
 
-  # EipA:
-  #   Type: AWS::EC2::EIP
-  #   Properties:
-  #     Domain: vpc
+  EipA:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
 
-  # NatGatewayC:
-  #   Type: AWS::EC2::NatGateway
-  #   Properties:
-  #     AllocationId: !GetAtt EipC.AllocationId
-  #     SubnetId: !Ref PublicSubnetC
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${PlatformName}-ngw-c
+  NatGatewayC:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EipC.AllocationId
+      SubnetId: !Ref PublicSubnetC
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-ngw-c
 
-  # EipC:
-  #   Type: AWS::EC2::EIP
-  #   Properties:
-  #     Domain: vpc
+  EipC:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
 
-  # NatGatewayD:
-  #   Type: AWS::EC2::NatGateway
-  #   Properties:
-  #     AllocationId: !GetAtt EipD.AllocationId
-  #     SubnetId: !Ref PublicSubnetD
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${PlatformName}-ngw-d
+  NatGatewayD:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EipD.AllocationId
+      SubnetId: !Ref PublicSubnetD
+      Tags:
+        - Key: Name
+          Value: !Sub ${PlatformName}-ngw-d
 
-  # EipD:
-  #   Type: AWS::EC2::EIP
-  #   Properties:
-  #     Domain: vpc
+  EipD:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
 
 Outputs:
   InternetGateway:
