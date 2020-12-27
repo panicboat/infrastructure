@@ -1,3 +1,4 @@
-Environment:
-  - Name: RAILS_LOG_TO_STDOUT
-    Value: true
+ContainerDefinitions:
+  Environment:
+    - Name: RAILS_LOG_TO_STDOUT
+      Value: true

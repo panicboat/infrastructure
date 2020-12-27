@@ -48,7 +48,7 @@ Resources:
               Value: Asia/Tokyo
             - Name: AWS_XRAY_DAEMON_ADDRESS
               Value: 127.0.0.1:2000
-% p[:Environment].each do |env|
+% p[:ContainerDefinitions][:Environment].each do |env|
             - Name: <%= env[:Name] %>
               Value: <%= env[:Value] %>
 % end

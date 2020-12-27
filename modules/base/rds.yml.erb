@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProductName:
+    Type: String
+  MasterUsername:
+    Type: String
+  PrivateSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+
+Resources:
+  MasterUserPassword:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      GenerateSecretString:
+        GenerateStringKey: password
+        PasswordLength: 32
+        SecretStringTemplate: '{}'
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: !Sub database subnet group for ${ProductName}
+      SubnetIds: !Ref PrivateSubnets
+
+  DBClusterParameterGroup:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Properties:
+      Description: !Sub database parameter group for ${ProductName}
+      Family: aurora-mysql5.7
+      Parameters:
+        time_zone: Asia/Tokyo
+
+  DBCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      BackupRetentionPeriod: 0
+      DBClusterIdentifier: !Ref ProductName
+      DBClusterParameterGroupName: !Ref DBClusterParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      DeletionProtection: false
+      Engine: aurora
+      EngineMode: serverless
+      EngineVersion: 5.7.mysql_aurora.2.09.1
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${MasterUserPassword}:SecretString:password::}}"
+      Port: 3306
+      PreferredBackupWindow: 20:00-20:30
+      PreferredMaintenanceWindow: Wed:08:00-Wed:08:30
+% if p[:DBCluster][:ScalingConfiguration].present?
+      ScalingConfiguration:
+        AutoPause: <%=p[:DBCluster][:ScalingConfiguration][:AutoPause]%>
+        MaxCapacity: <%=p[:DBCluster][:ScalingConfiguration][:MaxCapacity]%>
+        MinCapacity: <%=p[:DBCluster][:ScalingConfiguration][:MinCapacity]%>
+%   if p[:DBCluster][:ScalingConfiguration][:SecondsUntilAutoPause].present?
+        SecondsUntilAutoPause: <%=p[:DBCluster][:ScalingConfiguration][:SecondsUntilAutoPause]%>
+%   end
+% end
+      VpcSecurityGroupIds: !Ref SecurityGroups
