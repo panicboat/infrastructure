@@ -5,12 +5,12 @@ Parameters:
     Type: String
   GatewayId:
     Type: String
-  NatGatewayA:
-    Type: String
-  NatGatewayC:
-    Type: String
-  NatGatewayD:
-    Type: String
+  # NatGatewayA:
+  #   Type: String
+  # NatGatewayC:
+  #   Type: String
+  # NatGatewayD:
+  #   Type: String
   PrivateSubnetA:
     Type: AWS::EC2::Subnet::Id
   PrivateSubnetC:
@@ -72,7 +72,7 @@ Resources:
   # --------------------------------------------------
   # AWS::EC2::RouteTable for Protect
   # --------------------------------------------------
-  ProtectRouteTableA:
+  ProtectRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       Tags:
@@ -80,59 +80,29 @@ Resources:
           Value: !Sub ${PlatformName}-protect-rtb
       VpcId: !Ref VpcId
 
-  ProtectRouteA:
+  ProtectRoute:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
-      RouteTableId: !Ref ProtectRouteTableA
-      NatGatewayId: !Ref NatGatewayA
+      RouteTableId: !Ref ProtectRouteTable
+      GatewayId: !Ref GatewayId
 
   ProtectAssociationA:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref ProtectRouteTableA
+      RouteTableId: !Ref ProtectRouteTable
       SubnetId: !Ref ProtectSubnetA
-
-  ProtectRouteTableC:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      Tags:
-        - Key: Name
-          Value: !Sub ${PlatformName}-protect-rtb
-      VpcId: !Ref VpcId
-
-  ProtectRouteC:
-    Type: AWS::EC2::Route
-    Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      RouteTableId: !Ref ProtectRouteTableC
-      NatGatewayId: !Ref NatGatewayC
 
   ProtectAssociationC:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref ProtectRouteTableC
+      RouteTableId: !Ref ProtectRouteTable
       SubnetId: !Ref ProtectSubnetC
-
-  ProtectRouteTableD:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      Tags:
-        - Key: Name
-          Value: !Sub ${PlatformName}-protect-rtb
-      VpcId: !Ref VpcId
-
-  ProtectRouteD:
-    Type: AWS::EC2::Route
-    Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      RouteTableId: !Ref ProtectRouteTableD
-      NatGatewayId: !Ref NatGatewayD
 
   ProtectAssociationD:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref ProtectRouteTableD
+      RouteTableId: !Ref ProtectRouteTable
       SubnetId: !Ref ProtectSubnetD
 
   # --------------------------------------------------

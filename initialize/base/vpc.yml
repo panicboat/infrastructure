@@ -40,8 +40,8 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref ${PlatformName}-public-sg
-      GroupName: !Ref ${PlatformName}-public-sg
+          Value: !Sub ${PlatformName}-public-sg
+      GroupName: !Sub ${PlatformName}-public-sg
       GroupDescription: !Sub Allows public traffic for ${PlatformName}.
       VpcId: !Ref Vpc
 
