@@ -21,10 +21,10 @@ Parameters:
     Type: Number
 
 Resources:
-  IAM:
+  IamRoles:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/iam.yml
+      TemplateURL: ../modules/ecs/iam.yml
       Parameters:
         ProjectName: !Ref ProjectName
         AllowEcsPolicy: !Join [',', !Ref AllowEcsPolicy]
@@ -32,14 +32,14 @@ Resources:
   Foundations:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/foundations.yml
+      TemplateURL: ../modules/ecs/foundations.yml
       Parameters:
         ProjectName: !Ref ProjectName
 
   AppMesh:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/mesh.yml
+      TemplateURL: ../modules/ecs/mesh.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ContainerPort: !Ref ContainerPort
@@ -54,8 +54,8 @@ Resources:
         ProjectName: !Ref ProjectName
         ContainerName: !Ref ContainerName
         ContainerPort: !Ref ContainerPort
-        EcsTaskExecutionRoleArn: !GetAtt [IAM, Outputs.EcsTaskExecutionRole]
-        EcsTaskRoleArn: !GetAtt [IAM, Outputs.EcsTaskRoleArn]
+        EcsTaskExecutionRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskExecutionRole]
+        EcsTaskRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskRoleArn]
         LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
         RepositoryURI: !GetAtt [Foundations, Outputs.RepositoryURI]
         TaskCpu: !Ref TaskCpu
@@ -66,7 +66,7 @@ Resources:
   Service:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../../modules/ecs/services/internal.yml
+      TemplateURL: ../modules/ecs/services/internal.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ClusterArn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }

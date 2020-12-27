@@ -1,2 +1,3 @@
 .cfn-stack*.yml
 .task-definitions.yml
+.codepipeline.yml

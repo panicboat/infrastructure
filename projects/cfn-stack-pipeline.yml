@@ -13,11 +13,18 @@ Parameters:
     Type: String
   ContainerName:
     Type: String
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prd
   GitHubBranch:
     Type: String
   GitHubOwner:
     Type: String
   GitHubRepository:
+    Type: String
+  PrincipalID:
     Type: String
   ReleaseAccount:
     Type: String
@@ -28,8 +35,14 @@ Parameters:
   SlackWorkspaceId:
     Type: String
 
+Conditions:
+  IsProduction:
+    - !Equals [!Ref Environment, prd]
+  IsDevelopment:
+    - !Not IsProduction
+
 Resources:
-  IAM:
+  IamRoles:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ../modules/pipeline/iam.yml
@@ -46,15 +59,16 @@ Resources:
         SlackChannelId: !Ref SlackChannelId
         SlackWorkspaceId: !Ref SlackWorkspaceId
 
-  CodeBuild:
+  CodeBuildDev:
     Type: AWS::CloudFormation::Stack
+    Condition: IsDevelopment
     Properties:
       TemplateURL: ../modules/pipeline/dev/codebuild.yml
       Parameters:
         ProjectName: !Ref ProjectName
         BuildDirectory: !Ref BuildDirectory
         CICredentialArn: !Ref CICredentialArn
-        CodeBuildRole: !GetAtt [IAM, Outputs.CodeBuildRole]
+        CodeBuildRole: !GetAtt [IamRoles, Outputs.CodeBuildRole]
         ContainerName: !Ref ContainerName
         GitHubBranch: !Ref GitHubBranch
         GitHubOwner: !Ref GitHubOwner
@@ -65,8 +79,9 @@ Resources:
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
         VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
 
-  CodePipeline:
+  CodePipelineDev:
     Type: AWS::CloudFormation::Stack
+    Condition: IsDevelopment
     Properties:
       TemplateURL: ../modules/pipeline/dev/codepipeline.yml
       Parameters:
@@ -75,7 +90,7 @@ Resources:
         BuildProject: !GetAtt [CodeBuild, Outputs.DockerBuild]
         CICredentialArn: !Ref CICredentialArn
         ClusterName: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterName" }
-        CodePipelineRoleArn: !GetAtt [IAM, Outputs.CodePipelineRoleArn]
+        CodePipelineRoleArn: !GetAtt [IamRoles, Outputs.CodePipelineRoleArn]
         GitHubBranch: !Ref GitHubBranch
         GitHubOwner: !Ref GitHubOwner
         GitHubRepository: !Ref GitHubRepository
