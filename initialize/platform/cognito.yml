@@ -52,12 +52,9 @@ Resources:
     Properties:
       AllowedOAuthFlows:
         - code
-        - implicit
       AllowedOAuthScopes:
-        # - phone
         - email
         - openid
-        # - aws.cognito.signin.user.admin
         - profile
       ClientName: !Sub ${PlatformName}-users
       CallbackURLs: !Ref CallbackURLs
