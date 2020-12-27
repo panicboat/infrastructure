@@ -78,11 +78,11 @@ Outputs:
   InternetGateway:
     Value: !Ref InternetGateway
 
-  # NatGatewayA:
-  #   Value: !Ref NatGatewayA
+  NatGatewayA:
+    Value: !Ref NatGatewayA
 
-  # NatGatewayC:
-  #   Value: !Ref NatGatewayC
+  NatGatewayC:
+    Value: !Ref NatGatewayC
 
-  # NatGatewayD:
-  #   Value: !Ref NatGatewayD
+  NatGatewayD:
+    Value: !Ref NatGatewayD
