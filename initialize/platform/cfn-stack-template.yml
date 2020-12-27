@@ -40,12 +40,12 @@ Resources:
         PrivateNamespace: !Ref PrivateNamespace
         VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
 
-  AuroraServerless:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./.rds.yml
-      Parameters:
-        ProductName: !Ref ProductName
-        MasterUsername: !Ref PlatformName
-        PrivateSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetD"}]]
-        SecurityGroups: !Join [',', [!GetAtt [Vpc, Outputs.SecurityGroup]]]
+  # AuroraServerless:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: ./.rds.yml
+  #     Parameters:
+  #       ProductName: !Ref ProductName
+  #       MasterUsername: !Ref PlatformName
+  #       PrivateSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetD"}]]
+  #       SecurityGroups: !Join [',', [!GetAtt [Vpc, Outputs.SecurityGroup]]]
