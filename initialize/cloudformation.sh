@@ -66,7 +66,7 @@ fi
 aws cloudformation deploy \
     --template-file $SCRIPT_DIR/$project/$env/.cfn-stack-template.yml \
     --stack-name $platform-$project-initialize \
-    --parameter-overrides $params \
+    --parameter-overrides $params Environment=$env \
     --capabilities CAPABILITY_NAMED_IAM
 if [ $? -ne 0 ]; then
     exit $?
