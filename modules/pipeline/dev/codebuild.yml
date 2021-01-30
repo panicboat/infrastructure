@@ -19,7 +19,7 @@ Parameters:
     Type: String
   ProtectSubnets:
     Type: List<AWS::EC2::Subnet::Id>
-  ReleaseAccount:
+  ReleaseID:
     Type: String
   ReleaseVersion:
     Type: String
@@ -177,7 +177,7 @@ Resources:
           - Name: REPOSITORY_URI
             Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ProjectName}"
           - Name: PRODUCTION_URI
-            Value: !Sub "${ReleaseAccount}.dkr.ecr.${AWS::Region}.amazonaws.com/${ProjectName}"
+            Value: !Sub "${ReleaseID}.dkr.ecr.${AWS::Region}.amazonaws.com/${ProjectName}"
           - Name: GITHUB_OWNER
             Value: !Ref GitHubOwner
           - Name: GITHUB_PROJECT
@@ -185,9 +185,9 @@ Resources:
           - Name: RELEASE_VERSION
             Value: !Ref ReleaseVersion
           - Name: RELEASE_ACCOUNT
-            Value: !Ref ReleaseAccount
+            Value: !Ref ReleaseID
           - Name: ASSUME_ROLE_ARN
-            Value: !Sub "arn:aws:iam::${ReleaseAccount}:role/${ProjectName}-release-role"
+            Value: !Sub "arn:aws:iam::${ReleaseID}:role/${ProjectName}-release-role"
       ServiceRole: !Ref CodeBuildRole
       Source:
         Type: CODEPIPELINE
@@ -210,7 +210,6 @@ Resources:
               "  pre_build:",
               "    commands:",
               "      - echo Logging in to Amazon ECR...",
-              "      - aws --version",
               "      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)",
               "      - IMAGE_TAG=${COMMIT_HASH:=latest}",
               "      - RELEASE_TAG=`curl -X GET -H \"Authorization:token ${GITHUB_TOKEN}\" https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_PROJECT}/releases | jq -r '. | select(.[0].tag_name | startswith(\"'$RELEASE_VERSION'\"))' | jq -r .[0].tag_name`",
@@ -233,7 +232,6 @@ Resources:
               "      - echo \"role_arn = ${ASSUME_ROLE_ARN}\" >> credentials/config",
               "      - echo \"credential_source = EcsContainer\" >> credentials/config",
               "      - export AWS_CONFIG_FILE=${CODEBUILD_SRC_DIR}/credentials/config",
-              "      - aws sts get-caller-identity --profile production",
               "      - $(aws ecr get-login --registry-ids ${RELEASE_ACCOUNT} --no-include-email --region $AWS_DEFAULT_REGION --profile production)",
               "      - docker tag  $REPOSITORY_URI:$IMAGE_TAG $PRODUCTION_URI:$RELEASE_VERSION",
               "      - docker tag  $REPOSITORY_URI:$IMAGE_TAG $PRODUCTION_URI:$RELEASE_TAG",

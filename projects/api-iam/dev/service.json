@@ -4,8 +4,8 @@
     "ProjectName": "api-iam",
     "AllowEcsPolicy": "s3:*",
     "ContainerName": "app",
-    "ContainerPort": 80,
+    "ContainerPort": 3000,
+    "DesiredCount": 0,
     "TaskCpu": 256,
-    "TaskMemory": 512,
-    "DesiredCount": 0
+    "TaskMemory": 512
 }

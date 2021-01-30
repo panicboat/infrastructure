@@ -1,0 +1,6 @@
+DBCluster:
+  ScalingConfiguration:
+    AutoPause: true
+    MaxCapacity: 1
+    MinCapacity: 1
+    SecondsUntilAutoPause: 1800

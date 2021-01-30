@@ -2,3 +2,9 @@ ContainerDefinitions:
   Environment:
     - Name: RAILS_LOG_TO_STDOUT
       Value: true
+    - Name: AWS_ECS_CLUSTER_NAME
+      Value: platform
+    - Name: AWS_ECS_SERVICE_NAME
+      Value: iam
+    - Name: AWS_COGNITO_USERPOOL_ID
+      Value: ap-northeast-1_bdsz5rwUb

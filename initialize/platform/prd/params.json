@@ -2,6 +2,6 @@
   "PlatformName": "panicboat",
   "ProductName": "platform",
   "CallbackURLs": "http://localhost:1000",
-  "DomainName": "dev.panicboat.net",
+  "DomainName": "panicboat.net",
   "PrivateNamespace": "platform.svc.cluster.local"
 }

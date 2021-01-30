@@ -7,11 +7,7 @@ Parameters:
     Type: String
   BuildProject:
     Type: String
-  CodePipelineEventRoleArn:
-    Type: String
   CodePipelineRoleArn:
-    Type: String
-  CICredentialArn:
     Type: String
   ClusterName:
     Type: String
@@ -23,26 +19,6 @@ Parameters:
     Type: String
 
 Resources:
-  CodePipelineEventRule:
-    Type: AWS::Events::Rule
-    Properties:
-      EventPattern:
-        source:
-          - aws.ecr
-        detail:
-          eventName:
-            - PutImage
-          requestParameters:
-            repositoryName:
-              - !Ref EcrRepository
-            imageTag:
-              - !Ref ReleaseVersion
-      Targets:
-        - Arn: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CodePipeline}"
-          RoleArn: !Ref CodePipelineEventRoleArn
-          Id: !Ref ProjectName
-      Name: !Ref ProjectName
-
   CodePipelineNotificationRule:
     Type: AWS::CodeStarNotifications::NotificationRule
     Properties:
@@ -73,8 +49,8 @@ Resources:
               ActionTypeId:
                 Category: Source
                 Owner: AWS
+                Provider: ECR
                 Version: 1
-                Provider: ECS
               Configuration:
                 ImageTag: !Ref ReleaseVersion
                 RepositoryName: !Ref EcrRepository
@@ -112,3 +88,7 @@ Resources:
                 ServiceName: !Ref ProjectName
               OutputArtifacts: []
               RunOrder: 1
+
+Outputs:
+  CodePipeline:
+    Value: !Ref CodePipeline

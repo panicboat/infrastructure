@@ -5,6 +5,10 @@ Parameters:
     Type: String
   CICredentialArn:
     Type: String
+  CodeBuildRole:
+    Type: String
+  ContainerName:
+    Type: String
   GitHubOwner:
     Type: String
   GitHubRepository:
@@ -61,7 +65,6 @@ Resources:
             "  pre_build:",
             "    commands:",
             "      - echo Logging in to Amazon ECR...",
-            "      - aws --version",
             "      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)",
             "      - IMAGE_TAG=`curl -X GET -H \"Authorization:token ${GITHUB_TOKEN}\" https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_PROJECT}/releases | jq -r '. | select(.[0].tag_name | startswith(\"'$RELEASE_VERSION'\"))' | jq -r .[0].tag_name`",
             "  post_build:",

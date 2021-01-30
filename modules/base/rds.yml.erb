@@ -15,9 +15,10 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       GenerateSecretString:
+        ExcludeCharacters: '"@/\'
         GenerateStringKey: password
         PasswordLength: 32
-        SecretStringTemplate: '{}'
+        SecretStringTemplate: !Sub '{"username": "${MasterUsername}"}'
 
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -36,14 +37,14 @@ Resources:
   DBCluster:
     Type: AWS::RDS::DBCluster
     Properties:
-      BackupRetentionPeriod: 0
+      BackupRetentionPeriod: 1
       DBClusterIdentifier: !Ref ProductName
       DBClusterParameterGroupName: !Ref DBClusterParameterGroup
       DBSubnetGroupName: !Ref DBSubnetGroup
       DeletionProtection: false
-      Engine: aurora
+      Engine: aurora-mysql
       EngineMode: serverless
-      EngineVersion: 5.7.mysql_aurora.2.09.1
+      EngineVersion: 5.7.mysql_aurora.2.07.1
       MasterUsername: !Ref MasterUsername
       MasterUserPassword: !Sub "{{resolve:secretsmanager:${MasterUserPassword}:SecretString:password::}}"
       Port: 3306

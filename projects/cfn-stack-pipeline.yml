@@ -26,7 +26,7 @@ Parameters:
     Type: String
   PrincipalID:
     Type: String
-  ReleaseAccount:
+  ReleaseID:
     Type: String
   ReleaseVersion:
     Type: String
@@ -36,10 +36,10 @@ Parameters:
     Type: String
 
 Conditions:
-  IsProduction:
-    - !Equals [!Ref Environment, prd]
   IsDevelopment:
-    - !Not IsProduction
+    !Equals [!Ref Environment, dev]
+  IsProduction:
+    !Equals [!Ref Environment, prd]
 
 Resources:
   IamRoles:
@@ -59,7 +59,10 @@ Resources:
         SlackChannelId: !Ref SlackChannelId
         SlackWorkspaceId: !Ref SlackWorkspaceId
 
-  CodeBuildDev:
+  # --------------------------------------------------
+  # Development
+  # --------------------------------------------------
+  CodeBuild:
     Type: AWS::CloudFormation::Stack
     Condition: IsDevelopment
     Properties:
@@ -73,13 +76,13 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubOwner: !Ref GitHubOwner
         GitHubRepository: !Ref GitHubRepository
-        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectedSubnetD"}]]
-        ReleaseAccount: !Ref ReleaseAccount
+        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
+        ReleaseID: !Ref ReleaseID
         ReleaseVersion: !Ref ReleaseVersion
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
         VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
 
-  CodePipelineDev:
+  CodePipeline:
     Type: AWS::CloudFormation::Stack
     Condition: IsDevelopment
     Properties:
@@ -97,3 +100,50 @@ Resources:
         ReleaseProject: !GetAtt [CodeBuild, Outputs.Release]
         SlackChannelConfiguration: !GetAtt [Foundations, Outputs.SlackChannelConfiguration]
         TaggingProject: !GetAtt [CodeBuild, Outputs.GitHubTag]
+
+  # --------------------------------------------------
+  # Production
+  # --------------------------------------------------
+  CodeBuild:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsProduction
+    Properties:
+      TemplateURL: ../modules/pipeline/prd/codebuild.yml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        CICredentialArn: !Ref CICredentialArn
+        CodeBuildRole: !GetAtt [IamRoles, Outputs.CodeBuildRole]
+        ContainerName: !Ref ContainerName
+        GitHubOwner: !Ref GitHubOwner
+        GitHubRepository: !Ref GitHubRepository
+        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
+        ReleaseVersion: !Ref ReleaseVersion
+        SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
+        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
+
+  CodePipeline:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsProduction
+    Properties:
+      TemplateURL: ../modules/pipeline/prd/codepipeline.yml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        ArtifactBucket: { 'Fn::ImportValue': !Sub "${PlatformName}:ArtifactBucket" }
+        BuildProject: !GetAtt [CodeBuild, Outputs.DockerBuild]
+        CodePipelineRoleArn: !GetAtt [IamRoles, Outputs.CodePipelineRoleArn]
+        ClusterName: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterName" }
+        EcrRepository: !Ref ProjectName
+        ReleaseVersion: !Ref ReleaseVersion
+        SlackChannelConfiguration: !GetAtt [Foundations, Outputs.SlackChannelConfiguration]
+
+  CodePipelineEvent:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsProduction
+    Properties:
+      TemplateURL: ../modules/pipeline/prd/event.yml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        CodePipeline: !Ref ProjectName
+        EcrRepository: !GetAtt [CodePipeline, Outputs.CodePipeline]
+        PrincipalID: !Ref PrincipalID
+        ReleaseVersion: !Ref ReleaseVersion

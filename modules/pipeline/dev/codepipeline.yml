@@ -57,8 +57,8 @@ Resources:
               ActionTypeId:
                 Category: Source
                 Owner: ThirdParty
-                Version: 1
                 Provider: GitHub
+                Version: 1
               Configuration:
                 Owner: !Ref GitHubOwner
                 Repo: !Ref GitHubRepository
@@ -104,8 +104,8 @@ Resources:
               ActionTypeId:
                 Category: Approval
                 Owner: AWS
-                Version: 1
                 Provider: Manual
+                Version: 1
               RunOrder: 1
         - Name: Release
           Actions:
