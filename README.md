@@ -22,6 +22,12 @@ These instructions will get you a copy of the project up and running on your loc
 
 # Usage
 
+```bash
+read -p 'input product name : ' product
+read -p 'input project name : ' project
+read -p 'input env : ' env
+```
+
 ## Initialize ( at once )
 
 1. Create s3 bucket for Artifact.
@@ -38,7 +44,6 @@ sh main/networks.sh
 
 1. Deploy product initialize
 ```bash
-read -p 'input product name : ' product
 sh main/$product/initialize.sh
 ```
 
@@ -46,9 +51,6 @@ sh main/$product/initialize.sh
 
 1. Create Template of TaskDefinitons.
 ```bash
-read -p 'input product name : ' product
-read -p 'input project name : ' project
-read -p 'input env : ' env
 template_path=cfn/modules/ecs/task-definitions.yml.erb
 parameter_path=cfn/$product/$project/$env/environments.yml
 output_path=cfn/$product/$project/$env/.task-definitions.yml
@@ -57,15 +59,11 @@ docker-compose run app bash -c "ruby engine.rb --template $template_path --param
 
 2. Deploy Service.
 ```bash
-read -p 'input project name : ' project
-read -p 'input env : ' env
 sh projects/cloudformation.sh -e $env -p $project -t service
 ```
 
 ## Project Pipeline
 
 ```bash
-read -p 'input project name : ' project
-read -p 'input env : ' env
 sh projects/cloudformation.sh -e $env -p $project -t pipeline
 ```
