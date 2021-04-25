@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-SCRIPT_DIR=$(cd $(dirname $0); pwd)
+SCRIPT_DIR=$(cd $(dirname $0); pwd)/../../cfn/platform/api-advertisements
 
 # ------------------------------------------------------------------------------------------------------
 # Input Option
@@ -9,10 +9,6 @@ do
     case ${1} in
         --environment|-e)
             env=${2}
-            shift
-        ;;
-        --project|-p)
-            project=${2}
             shift
         ;;
         --template|-t)
@@ -27,28 +23,19 @@ do
     shift
 done
 
-if [ -z "$project" ] || [ ! -d "$SCRIPT_DIR/$project" ]; then
-    while true; do
-        read -p 'What project do you deploy to? : ' project
-        if [ -n "$project" ] && [ -d "$SCRIPT_DIR/$project" ]; then
-            break
-        fi
-    done
-fi
-
-if [ -z "$env" ] || [ ! -d "$SCRIPT_DIR/$project/$env" ]; then
+if [ -z "$env" ] || [ ! -d "$SCRIPT_DIR/$env" ]; then
     while true; do
         read -p 'What environment do you deploy to? ( dev / prd ) : ' env
-        if [ -n "$env" ] && [ -d "$SCRIPT_DIR/$project/$env" ]; then
+        if [ -n "$env" ] && [ -d "$SCRIPT_DIR/$env" ]; then
             break
         fi
     done
 fi
 
-if [ -z "$template" ] || [ ! -f "$SCRIPT_DIR/$project/$env/$template.json" ]; then
+if [ -z "$template" ] || [ ! -f "$SCRIPT_DIR/$env/$template.json" ]; then
     while true; do
         read -p 'What template do you deploy to? : ' template
-        if [ -n "$template" ] && [ -f "$SCRIPT_DIR/$project/$env/$template.json" ]; then
+        if [ -n "$template" ] && [ -f "$SCRIPT_DIR/$env/$template.json" ]; then
             break
         fi
     done
@@ -57,9 +44,9 @@ fi
 # ------------------------------------------------------------------------------------------------------
 # Parameters
 # ------------------------------------------------------------------------------------------------------
-params=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
-platform=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '.PlatformName'`
-product=`cat $SCRIPT_DIR/$project/$env/$template.json | jq -r '.ProductName'`
+params=`cat $SCRIPT_DIR/$env/$template.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
+platform=`cat $SCRIPT_DIR/$env/$template.json | jq -r '.PlatformName'`
+product=`cat $SCRIPT_DIR/$env/$template.json | jq -r '.ProductName'`
 
 # ------------------------------------------------------------------------------------------------------
 # Package
@@ -68,8 +55,8 @@ artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 's
 aws cloudformation package \
     --template-file $SCRIPT_DIR/cfn-stack-$template.yml \
     --s3-bucket $artifact_bucket \
-    --s3-prefix cloudformation/projects/$project \
-    --output-template-file $SCRIPT_DIR/$project/$env/.cfn-stack-$template.yml
+    --s3-prefix cloudformation/projects \
+    --output-template-file $SCRIPT_DIR/$env/.cfn-stack-$template.yml
 if [ $? -ne 0 ]; then
     exit $?
 fi
@@ -78,7 +65,7 @@ fi
 # Deploy
 # ------------------------------------------------------------------------------------------------------
 aws cloudformation deploy \
-    --template-file $SCRIPT_DIR/$project/$env/.cfn-stack-$template.yml \
+    --template-file $SCRIPT_DIR/$env/.cfn-stack-$template.yml \
     --stack-name $product-$project-$template \
     --parameter-overrides $params Environment=$env \
     --capabilities CAPABILITY_NAMED_IAM

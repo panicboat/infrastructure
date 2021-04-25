@@ -26,46 +26,46 @@ These instructions will get you a copy of the project up and running on your loc
 
 1. Create s3 bucket for Artifact.
 ```bash
-sh artifacts/cloudformation.sh
+sh main/artifacts.sh
 ```
 
-2. Deploy initial resources.
+2. Deploy network resources.
 ```bash
-sh initialize/cloudformation.sh -e $env -p base
+sh main/networks.sh
 ```
 
-## Product Base
+## Product initialize
 
-1. Create Template of RDS.
+1. Deploy product initialize
 ```bash
-template_path=modules/base/rds.yml.erb
-parameter_path=initialize/$product/$env/environments.yml
-output_path=initialize/$product/.rds.yml
-docker-compose run app bash -c "ruby engine.rb --template $template_path --parameter $parameter_path > $output_path"
-```
-
-2. Deploy Base for Product.
-```bash
-sh initialize/cloudformation.sh -e $env -p $product
+read -p 'input product name : ' product
+sh main/$product/initialize.sh
 ```
 
 ## Project Service
 
 1. Create Template of TaskDefinitons.
 ```bash
-template_path=modules/ecs/task-definitions.yml.erb
-parameter_path=projects/$project/$env/environments.yml
-output_path=projects/.task-definitions.yml
+read -p 'input product name : ' product
+read -p 'input project name : ' project
+read -p 'input env : ' env
+template_path=cfn/modules/ecs/task-definitions.yml.erb
+parameter_path=cfn/$product/$project/$env/environments.yml
+output_path=cfn/$product/$project/$env/.task-definitions.yml
 docker-compose run app bash -c "ruby engine.rb --template $template_path --parameter $parameter_path > $output_path"
 ```
 
 2. Deploy Service.
 ```bash
+read -p 'input project name : ' project
+read -p 'input env : ' env
 sh projects/cloudformation.sh -e $env -p $project -t service
 ```
 
 ## Project Pipeline
 
 ```bash
+read -p 'input project name : ' project
+read -p 'input env : ' env
 sh projects/cloudformation.sh -e $env -p $project -t pipeline
 ```

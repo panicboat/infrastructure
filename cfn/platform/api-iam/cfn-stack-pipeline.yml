@@ -45,14 +45,14 @@ Resources:
   IamRoles:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../modules/pipeline/iam.yml
+      TemplateURL: ../../modules/pipeline/iam.yml
       Parameters:
         ProjectName: !Ref ProjectName
 
   Foundations:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../modules/pipeline/foundations.yml
+      TemplateURL: ../../modules/pipeline/foundations.yml
       Parameters:
         ProjectName: !Ref ProjectName
         IamRoleArn: { 'Fn::ImportValue': !Sub "${PlatformName}:ChatbotRoleArn" }
@@ -66,7 +66,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: IsDevelopment
     Properties:
-      TemplateURL: ../modules/pipeline/dev/codebuild.yml
+      TemplateURL: ../../modules/pipeline/dev/codebuild.yml
       Parameters:
         ProjectName: !Ref ProjectName
         BuildDirectory: !Ref BuildDirectory
@@ -86,7 +86,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: IsDevelopment
     Properties:
-      TemplateURL: ../modules/pipeline/dev/codepipeline.yml
+      TemplateURL: ../../modules/pipeline/dev/codepipeline.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ArtifactBucket: { 'Fn::ImportValue': !Sub "${PlatformName}:ArtifactBucket" }
@@ -108,7 +108,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: IsProduction
     Properties:
-      TemplateURL: ../modules/pipeline/prd/codebuild.yml
+      TemplateURL: ../../modules/pipeline/prd/codebuild.yml
       Parameters:
         ProjectName: !Ref ProjectName
         CICredentialArn: !Ref CICredentialArn
@@ -125,7 +125,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: IsProduction
     Properties:
-      TemplateURL: ../modules/pipeline/prd/codepipeline.yml
+      TemplateURL: ../../modules/pipeline/prd/codepipeline.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ArtifactBucket: { 'Fn::ImportValue': !Sub "${PlatformName}:ArtifactBucket" }
@@ -140,7 +140,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: IsProduction
     Properties:
-      TemplateURL: ../modules/pipeline/prd/event.yml
+      TemplateURL: ../../modules/pipeline/prd/event.yml
       Parameters:
         ProjectName: !Ref ProjectName
         CodePipeline: !Ref ProjectName

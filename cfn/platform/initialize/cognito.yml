@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  ProductName:
     Type: String
   CallbackURLs:
     Type: CommaDelimitedList
@@ -14,7 +14,7 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: !Sub ${PlatformName}-users
+      UserPoolName: !Sub ${ProductName}-users
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: true
       AliasAttributes:
@@ -44,7 +44,7 @@ Resources:
       # CustomDomainConfig:
       #   CertificateArn: !Ref CertificateArn
       # Domain: !Sub auth.${DomainName}
-      Domain: !Ref PlatformName
+      Domain: !Ref ProductName
       UserPoolId: !Ref UserPool
 
   UserPoolClient:
@@ -57,7 +57,7 @@ Resources:
         - email
         - openid
         - profile
-      ClientName: !Sub ${PlatformName}-users
+      ClientName: !Sub ${ProductName}-users
       CallbackURLs: !Ref CallbackURLs
       ExplicitAuthFlows:
         - ALLOW_CUSTOM_AUTH
@@ -73,4 +73,4 @@ Outputs:
   UserPool:
     Value: !Ref UserPool
     Export:
-      Name: !Sub ${PlatformName}:UserPool
+      Name: !Sub ${ProductName}:UserPool

@@ -50,13 +50,9 @@ Resources:
       Port: 3306
       PreferredBackupWindow: 20:00-20:30
       PreferredMaintenanceWindow: Wed:08:00-Wed:08:30
-% if p[:DBCluster][:ScalingConfiguration].present?
       ScalingConfiguration:
-        AutoPause: <%=p[:DBCluster][:ScalingConfiguration][:AutoPause]%>
-        MaxCapacity: <%=p[:DBCluster][:ScalingConfiguration][:MaxCapacity]%>
-        MinCapacity: <%=p[:DBCluster][:ScalingConfiguration][:MinCapacity]%>
-%   if p[:DBCluster][:ScalingConfiguration][:SecondsUntilAutoPause].present?
-        SecondsUntilAutoPause: <%=p[:DBCluster][:ScalingConfiguration][:SecondsUntilAutoPause]%>
-%   end
-% end
+        AutoPause: true
+        MaxCapacity: 1
+        MinCapacity: 1
+        SecondsUntilAutoPause: 1800
       VpcSecurityGroupIds: !Ref SecurityGroups

@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-SCRIPT_DIR=$(cd $(dirname $0); pwd)
+SCRIPT_DIR=$(cd $(dirname $0); pwd)/../cfn/networks
 
 # ------------------------------------------------------------------------------------------------------
 # Input Option
@@ -11,10 +11,6 @@ do
             env=${2}
             shift
         ;;
-        --project|-p)
-            project=${2}
-            shift
-        ;;
         *)
             echo "[ERROR] Invalid option '${1}'"
             exit 1
@@ -23,19 +19,10 @@ do
     shift
 done
 
-if [ -z "$project" ] || [ ! -d "$SCRIPT_DIR/$project" ]; then
-    while true; do
-        read -p 'What project do you deploy to? : ' project
-        if [ -n "$project" ] && [ -d "$SCRIPT_DIR/$project" ]; then
-            break
-        fi
-    done
-fi
-
-if [ -z "$env" ] || [ ! -d "$SCRIPT_DIR/$project/$env" ]; then
+if [ -z "$env" ] || [ ! -d "$SCRIPT_DIR/$env" ]; then
     while true; do
         read -p 'What environment do you deploy to? ( dev / prd ) : ' env
-        if [ -n "$env" ] && [ -d "$SCRIPT_DIR/$project/$env" ]; then
+        if [ -n "$env" ] && [ -d "$SCRIPT_DIR/$env" ]; then
             break
         fi
     done
@@ -44,18 +31,18 @@ fi
 # ------------------------------------------------------------------------------------------------------
 # Parameters
 # ------------------------------------------------------------------------------------------------------
-params=`cat $SCRIPT_DIR/$project/$env/params.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
-platform=`cat $SCRIPT_DIR/$project/$env/params.json | jq -r '.PlatformName'`
+params=`cat $SCRIPT_DIR/$env/params.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
+platform=`cat $SCRIPT_DIR/$env/params.json | jq -r '.PlatformName'`
 
 # ------------------------------------------------------------------------------------------------------
 # Package
 # ------------------------------------------------------------------------------------------------------
 artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$platform':ArtifactBucket")) | .Value'`
 aws cloudformation package \
-    --template-file $SCRIPT_DIR/$project/cfn-stack-template.yml \
+    --template-file $SCRIPT_DIR/cfn-stack-template.yml \
     --s3-bucket $artifact_bucket \
-    --s3-prefix cloudformation/initialize/$project \
-    --output-template-file $SCRIPT_DIR/$project/$env/.cfn-stack-template.yml
+    --s3-prefix cloudformation/networks \
+    --output-template-file $SCRIPT_DIR/$env/.cfn-stack-template.yml
 if [ $? -ne 0 ]; then
     exit $?
 fi
@@ -64,8 +51,8 @@ fi
 # Deploy
 # ------------------------------------------------------------------------------------------------------
 aws cloudformation deploy \
-    --template-file $SCRIPT_DIR/$project/$env/.cfn-stack-template.yml \
-    --stack-name $platform-$project-initialize \
+    --template-file $SCRIPT_DIR/$env/.cfn-stack-template.yml \
+    --stack-name $platform-networks \
     --parameter-overrides $params Environment=$env \
     --capabilities CAPABILITY_NAMED_IAM
 if [ $? -ne 0 ]; then

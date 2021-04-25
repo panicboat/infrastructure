@@ -18,7 +18,7 @@ Resources:
     Properties:
       TemplateURL: ./cognito.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        ProductName: !Ref ProductName
         CallbackURLs: !Ref CallbackURLs
         CertificateArn: { 'Fn::ImportValue': !Sub "${PlatformName}:CertificateArn" }
         DomainName: !Ref DomainName
@@ -26,7 +26,7 @@ Resources:
   Vpc:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/base/vpc.yml
+      TemplateURL: ./vpc.yml
       Parameters:
         ProductName: !Ref ProductName
         VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
@@ -34,7 +34,7 @@ Resources:
   Ecs:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/base/ecs.yml
+      TemplateURL: ../../modules/ecs.yml
       Parameters:
         ProductName: !Ref ProductName
         PrivateNamespace: !Ref PrivateNamespace
@@ -43,7 +43,7 @@ Resources:
   AuroraServerless:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./.rds.yml
+      TemplateURL: ./rds.yml
       Parameters:
         ProductName: !Ref ProductName
         MasterUsername: !Ref PlatformName
