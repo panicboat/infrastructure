@@ -24,9 +24,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ```bash
 read -p 'input env : ' env
-read -p 'input product name : ' product
-read -p 'input project name : ' project
-read -p 'input service name : ' service
+read -p 'input product name : ' PRODUCT
+read -p 'input project name : ' PROJECT
+read -p 'input service name : ' SERVICE
 ```
 
 ## Initialize ( at once )
@@ -38,33 +38,33 @@ sh main/artifacts.sh
 
 2. Deploy network resources.
 ```bash
-sh main/networks.sh -e $env
+sh main/networks.sh -e $ENV
 ```
 
 ## Product initialize
 
 1. Deploy product initialize
 ```bash
-sh main/$product/initialize.sh -e $env
+sh main/$PRODUCT/initialize.sh -e $ENV
 ```
 
 ## Project Service
 
 1. Create Template of TaskDefinitons.
 ```bash
-template_path=cfn/modules/ecs/task-definitions.yml.erb
-parameter_path=cfn/$product/$project/$env/environments.yml
-output_path=cfn/$product/$project/.task-definitions.yml
-docker-compose run app bash -c "ruby engine.rb --template $template_path --parameter $parameter_path > $output_path"
+TEMPLATE_FILE_PATH=cfn/modules/ecs/task-definitions.yml.erb
+PARAMETER_FILE_PATH=cfn/$PRODUCT/$PROJECT/$ENV/environments.yml
+OUTPUT_FILE_PATH=cfn/$PRODUCT/$PROJECT/.task-definitions.yml
+docker-compose run app bash -c "ruby engine.rb --template $TEMPLATE_FILE_PATH --parameter $PARAMETER_FILE_PATH > $OUTPUT_FILE_PATH"
 ```
 
 2. Deploy Service.
 ```bash
-sh main/$product/$service.sh -e $env -t service
+sh main/$PRODUCT/$SERVICE.sh -e $ENV -t service
 ```
 
 ## Project Pipeline
 
 ```bash
-sh main/$product/$service.sh -e $env -t pipeline
+sh main/$PRODUCT/$SERVICE.sh -e $ENV -t pipeline
 ```

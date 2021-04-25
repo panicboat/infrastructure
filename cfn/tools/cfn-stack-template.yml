@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Resources:
+  MailForwarder:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./mail-forwarder.yml
+      Parameters:
+        ProjectName: pnb-mail-forwarder
