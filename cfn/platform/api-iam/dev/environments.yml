@@ -7,4 +7,4 @@ ContainerDefinitions:
     - Name: AWS_ECS_SERVICE_NAME
       Value: iam
     - Name: AWS_COGNITO_USERPOOL_ID
-      Value: !ImportValue platform:UserPool
+      Value: "!ImportValue platform:UserPool"

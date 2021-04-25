@@ -23,9 +23,10 @@ These instructions will get you a copy of the project up and running on your loc
 # Usage
 
 ```bash
+read -p 'input env : ' env
 read -p 'input product name : ' product
 read -p 'input project name : ' project
-read -p 'input env : ' env
+read -p 'input service name : ' service
 ```
 
 ## Initialize ( at once )
@@ -37,14 +38,14 @@ sh main/artifacts.sh
 
 2. Deploy network resources.
 ```bash
-sh main/networks.sh
+sh main/networks.sh -e $env
 ```
 
 ## Product initialize
 
 1. Deploy product initialize
 ```bash
-sh main/$product/initialize.sh
+sh main/$product/initialize.sh -e $env
 ```
 
 ## Project Service
@@ -53,17 +54,17 @@ sh main/$product/initialize.sh
 ```bash
 template_path=cfn/modules/ecs/task-definitions.yml.erb
 parameter_path=cfn/$product/$project/$env/environments.yml
-output_path=cfn/$product/$project/$env/.task-definitions.yml
+output_path=cfn/$product/$project/.task-definitions.yml
 docker-compose run app bash -c "ruby engine.rb --template $template_path --parameter $parameter_path > $output_path"
 ```
 
 2. Deploy Service.
 ```bash
-sh projects/cloudformation.sh -e $env -p $project -t service
+sh main/$product/$service.sh -e $env -t service
 ```
 
 ## Project Pipeline
 
 ```bash
-sh projects/cloudformation.sh -e $env -p $project -t pipeline
+sh main/$product/$service.sh -e $env -t pipeline
 ```
