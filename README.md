@@ -23,7 +23,7 @@ These instructions will get you a copy of the project up and running on your loc
 # Usage
 
 ```bash
-read -p 'input env : ' env
+read -p 'input env : ' ENV
 read -p 'input product name : ' PRODUCT
 read -p 'input project name : ' PROJECT
 read -p 'input service name : ' SERVICE
@@ -52,10 +52,10 @@ sh main/$PRODUCT/initialize.sh -e $ENV
 
 1. Create Template of TaskDefinitons.
 ```bash
-TEMPLATE_FILE_PATH=cfn/modules/ecs/task-definitions.yml.erb
-PARAMETER_FILE_PATH=cfn/$PRODUCT/$PROJECT/$ENV/environments.yml
-OUTPUT_FILE_PATH=cfn/$PRODUCT/$PROJECT/.task-definitions.yml
-docker-compose run app bash -c "ruby engine.rb --template $TEMPLATE_FILE_PATH --parameter $PARAMETER_FILE_PATH > $OUTPUT_FILE_PATH"
+TEMPLATE_FILE_PATH=modules/ecs/task-definitions.yml.erb
+PARAMETER_FILE_PATH=$PRODUCT/$PROJECT/$ENV/environments.yml
+OUTPUT_FILE_PATH=$PRODUCT/$PROJECT/.task-definitions.yml
+docker-compose -f cfn/docker-compose.yml run app bash -c "ruby engine.rb --template $TEMPLATE_FILE_PATH --parameter $PARAMETER_FILE_PATH > $OUTPUT_FILE_PATH"
 ```
 
 2. Deploy Service.
