@@ -11,6 +11,32 @@ Parameters:
     Type: String
 
 Resources:
+  VirtualGateway:
+    Type: AWS::AppMesh::VirtualGateway
+    Properties:
+      MeshName: !Ref MeshName
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: !Ref ContainerPort
+              Protocol: http
+      VirtualGatewayName: !Ref ProjectName
+
+  GatewayRoute:
+    Type: AWS::AppMesh::GatewayRoute
+    Properties:
+      GatewayRouteName: !Ref ProjectName
+      MeshName: !Ref MeshName
+      Spec:
+        HttpRoute:
+          Action:
+            Target:
+              VirtualService:
+                VirtualServiceName: !GetAtt VirtualService.VirtualServiceName
+          Match:
+            Prefix: /
+      VirtualGatewayName: !GetAtt VirtualGateway.VirtualGatewayName
+
   VirtualService:
     Type: AWS::AppMesh::VirtualService
     Properties:
@@ -36,7 +62,6 @@ Resources:
     Type: AWS::AppMesh::Route
     Properties:
       MeshName: !Ref MeshName
-      VirtualRouterName: !GetAtt VirtualRouter.VirtualRouterName
       RouteName: !Ref ProjectName
       Spec:
         HttpRoute:
@@ -46,6 +71,7 @@ Resources:
                 Weight: 1
           Match:
             Prefix: /
+      VirtualRouterName: !GetAtt VirtualRouter.VirtualRouterName
 
   VirtualNode:
     Type: AWS::AppMesh::VirtualNode

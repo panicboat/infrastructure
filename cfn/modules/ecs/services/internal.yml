@@ -17,18 +17,6 @@ Parameters:
     Type: String
 
 Resources:
-  ServiceDiscovery:
-    Type: AWS::ServiceDiscovery::Service
-    Properties:
-      HealthCheckCustomConfig:
-        FailureThreshold: 1
-      DnsConfig:
-        DnsRecords:
-          - Type: A
-            TTL: 60
-        NamespaceId: !Ref NamespaceId
-      Name: !Ref ProjectName
-
   Service:
     Type: AWS::ECS::Service
     Properties:
@@ -41,6 +29,4 @@ Resources:
           SecurityGroups: !Ref SecurityGroups
           Subnets: !Ref ProtectSubnets
       ServiceName: !Ref ProjectName
-      ServiceRegistries:
-        - RegistryArn: !GetAtt ServiceDiscovery.Arn
       TaskDefinition: !Ref TaskDefinitionArn
