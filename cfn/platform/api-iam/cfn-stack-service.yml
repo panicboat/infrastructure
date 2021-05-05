@@ -46,23 +46,6 @@ Resources:
         MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
         PrivateNamespace: { 'Fn::ImportValue': !Sub "${ProductName}:PrivateNamespace" }
 
-  Gateway:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ../../modules/ecs/gateway.yml
-      Parameters:
-        ProjectName: !Sub ${ProjectName}-gw
-        ClusterArn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
-        DesiredCount: 1
-        EcsTaskExecutionRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskExecutionRole]
-        EcsTaskRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskRoleArn]
-        LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
-        MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
-        NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
-        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
-        SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }, { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
-        VirtualServiceName: !GetAtt [AppMesh, Outputs.VirtualServiceName]
-
   TaskDefinitions:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -92,3 +75,36 @@ Resources:
         ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }, { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
         TaskDefinitionArn: !GetAtt [TaskDefinitions, Outputs.TaskDefinitionArn]
+
+  VirtualGateway:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/ecs/gateway/mesh.yml
+      Parameters:
+        ProjectName: !Sub ${ProjectName}-gw
+        MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+        VirtualServiceName: !GetAtt [AppMesh, Outputs.VirtualServiceName]
+
+  GatewayDefinitions:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/ecs/gateway/task-definitions.yml
+      Parameters:
+        ProjectName: !Sub ${ProjectName}-gw
+        EcsTaskExecutionRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskExecutionRole]
+        EcsTaskRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskRoleArn]
+        LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
+        MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
+
+  GatewayService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ../../modules/ecs/gateway/service.yml
+      Parameters:
+        ProjectName: !Sub ${ProjectName}-gw
+        ClusterArn: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterArn" }
+        DesiredCount: 1
+        NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
+        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
+        SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }, { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
+        TaskDefinitionArn: !GetAtt [GatewayDefinitions, Outputs.TaskDefinitionArn]

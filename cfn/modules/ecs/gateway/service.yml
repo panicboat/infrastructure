@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProjectName:
+    Type: String
+  ClusterArn:
+    Type: String
+  DesiredCount:
+    Type: Number
+  NamespaceId:
+    Type: String
+  ProtectSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  TaskDefinitionArn:
+    Type: String
+
+Resources:
+  ServiceDiscovery:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: !Ref ProjectName
+      DnsConfig:
+        NamespaceId: !Ref NamespaceId
+        DnsRecords:
+          - Type: A
+            TTL: 300
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+  GatewayService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ClusterArn
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt ServiceDiscovery.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED   # TODO: Set to DISABLED when using NAT Gateway
+          SecurityGroups: !Ref SecurityGroups
+          Subnets: !Ref ProtectSubnets
+      ServiceName: !Ref ProjectName
+      TaskDefinition: !Ref TaskDefinitionArn
+      # LoadBalancers:
+      #   - ContainerName: envoy
+      #     ContainerPort: 9080
+      #     TargetGroupArn: !Ref WebTargetGroup

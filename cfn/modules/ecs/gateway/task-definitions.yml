@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProjectName:
+    Type: String
+  EcsTaskExecutionRoleArn:
+    Type: String
+  EcsTaskRoleArn:
+    Type: String
+  LogGroup:
+    Type: String
+  MeshName:
+    Type: String
+
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - FARGATE
+      Family: !Ref ProjectName
+      NetworkMode: awsvpc
+      Cpu: 256
+      Memory: 512
+      TaskRoleArn: !Ref EcsTaskRoleArn
+      ExecutionRoleArn: !Ref EcsTaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: envoy
+          Image: !Sub "840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.15.1.0-prod"
+          PortMappings:
+            - ContainerPort: 9901
+              Protocol: tcp
+            - ContainerPort: 9080
+              Protocol: tcp
+          Environment:
+            - Name: APPMESH_VIRTUAL_NODE_NAME
+              Value: !Sub "arn:aws:appmesh:${AWS::Region}:${AWS::AccountId}:mesh/${MeshName}/virtualNode/${ProjectName}"
+            - Name: ENVOY_LOG_LEVEL
+              Value: info
+            - Name: ENABLE_ENVOY_XRAY_TRACING
+              Value: 1
+            - Name: ENABLE_ENVOY_STATS_TAGS
+              Value: 1
+          HealthCheck:
+            Command: [ "CMD-SHELL", "curl -s http://127.0.0.1:9901/server_info | grep state | grep -q LIVE" ]
+            Interval: 5
+            Timeout: 2
+            Retries: 3
+          User: 1337
+          Ulimits:
+            - Name: nofile
+              HardLimit: 15000
+              SoftLimit: 15000
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: gw-envoy
+          Essential: true
+        - Name: xray
+          Image: amazon/aws-xray-daemon
+          PortMappings:
+            - ContainerPort: 2000
+              HostPort: 2000
+              Protocol: tcp
+          User: 1337
+          Cpu: 32
+          MemoryReservation: 256
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: gw-xray
+          Essential: true
+
+Outputs:
+  TaskDefinitionArn:
+    Value: !Ref TaskDefinition
