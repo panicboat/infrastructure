@@ -23,10 +23,10 @@ These instructions will get you a copy of the project up and running on your loc
 # Usage
 
 ```bash
-read -p 'input env : ' ENV
-read -p 'input product name : ' PRODUCT
-read -p 'input project name : ' PROJECT
-read -p 'input service name : ' SERVICE
+read -p 'input env : ' ENV                # dev or prd
+read -p 'input product name : ' PRODUCT   # platform
+read -p 'input project name : ' PROJECT   # api-iam
+read -p 'input service name : ' SERVICE   # service or pipeline
 ```
 
 ## Initialize ( at once )

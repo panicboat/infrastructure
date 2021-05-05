@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ProjectName:
+    Type: String
+  ClusterArn:
+    Type: String
+  DesiredCount:
+    Type: Number
+  EcsTaskExecutionRoleArn:
+    Type: String
+  EcsTaskRoleArn:
+    Type: String
+  LogGroup:
+    Type: String
+  MeshName:
+    Type: String
+  NamespaceId:
+    Type: String
+  ProtectSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  VirtualServiceName:
+    Type: String
+
+Resources:
+  ServiceDiscovery:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: !Ref ProjectName
+      DnsConfig:
+        NamespaceId: !Ref NamespaceId
+        DnsRecords:
+          - Type: A
+            TTL: 300
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - FARGATE
+      Family: !Ref ProjectName
+      NetworkMode: awsvpc
+      Cpu: 256
+      Memory: 512
+      TaskRoleArn: !Ref EcsTaskRoleArn
+      ExecutionRoleArn: !Ref EcsTaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: app
+          Image: !Sub "840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.15.1.0-prod"
+          Essential: true
+          Ulimits:
+            - Name: nofile
+              HardLimit: 15000
+              SoftLimit: 15000
+          PortMappings:
+            - ContainerPort: 9901
+              Protocol: tcp
+            - ContainerPort: 9080
+              Protocol: tcp
+          HealthCheck:
+            Command: [ "CMD-SHELL", "curl -s http://127.0.0.1:9901/server_info | grep state | grep -q LIVE" ]
+            Interval: 5
+            Timeout: 2
+            Retries: 3
+            StartPeriod: 60
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: gateway
+          Environment:
+            - Name: APPMESH_VIRTUAL_NODE_NAME
+              Value: !Sub "arn:aws:appmesh:${AWS::Region}:${AWS::AccountId}:mesh/${MeshName}/virtualNode/${ProjectName}"
+            - Name: ENABLE_ENVOY_STATS_TAGS
+              Value: 1
+            - Name: ENABLE_ENVOY_DOG_STATSD
+              Value: 1
+            - Name: STATSD_PORT
+              Value: 8125
+        - Name: cloudwatch-agent
+          Image: amazon/cloudwatch-agent:latest
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8125
+              Protocol: udp
+          Environment:
+            - Name: CW_CONFIG_CONTENT
+              Value:
+                Fn::Sub:
+                  - "{ \"metrics\": { \"namespace\":\"${MetricNamespace}\", \"metrics_collected\": { \"statsd\": { \"metrics_aggregation_interval\": 0}}}}"
+                  - MetricNamespace: !Join ['/', [gateway, StatsD]]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: gateway-cloudwatch-agent
+
+  GatewayService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ClusterArn
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt ServiceDiscovery.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED   # TODO: Set to DISABLED when using NAT Gateway
+          SecurityGroups: !Ref SecurityGroups
+          Subnets: !Ref ProtectSubnets
+      ServiceName: !Ref ProjectName
+      TaskDefinition: !Ref TaskDefinition
+      # LoadBalancers:
+      #   - ContainerName: app
+      #     ContainerPort: 9080
+      #     TargetGroupArn: !Ref WebTargetGroup
+
+  VirtualGateway:
+    Type: AWS::AppMesh::VirtualGateway
+    Properties:
+      MeshName: !Ref MeshName
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 9080
+              Protocol: http
+      VirtualGatewayName: !Ref ProjectName
+
+  GatewayRoute:
+    Type: AWS::AppMesh::GatewayRoute
+    Properties:
+      GatewayRouteName: !Ref ProjectName
+      MeshName: !Ref MeshName
+      Spec:
+        HttpRoute:
+          Action:
+            Target:
+              VirtualService:
+                VirtualServiceName: !Ref VirtualServiceName
+          Match:
+            Prefix: /
+      VirtualGatewayName: !GetAtt VirtualGateway.VirtualGatewayName
