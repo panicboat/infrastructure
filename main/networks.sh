@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-SCRIPT_DIR=$(cd $(dirname $0); pwd)/../cfn/networks
+SCRIPT_DIR=$(cd $(dirname $0); pwd)/../cfn/modules/networks
 
 # ------------------------------------------------------------------------------------------------------
 # Input Option

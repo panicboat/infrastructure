@@ -26,6 +26,7 @@ fi
 aws cloudformation deploy \
     --template-file $SCRIPT_DIR/.cfn-stack-template.yml \
     --stack-name panicboat-tools \
+    --parameter-overrides $params \
     --capabilities CAPABILITY_NAMED_IAM \
     --region us-east-1
 if [ $? -ne 0 ]; then
