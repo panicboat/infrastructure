@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd $(dirname $0); pwd)/../cfn/tools
 # ------------------------------------------------------------------------------------------------------
 # Package
 # ------------------------------------------------------------------------------------------------------
-artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$platform':ArtifactBucket")) | .Value'`
+artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$organization':ArtifactBucket")) | .Value'`
 aws cloudformation package \
     --template-file $SCRIPT_DIR/cfn-stack-template.yml \
     --s3-bucket $artifact_bucket \

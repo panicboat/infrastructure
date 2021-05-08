@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
   VpcCidrBlock:
     Type: String
@@ -16,16 +16,16 @@ Resources:
       InstanceTenancy: default
       Tags:
         - Key: Name
-          Value: !Ref PlatformName
+          Value: !Ref OrganizationName
 
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-internal-sg
-      GroupName: !Sub ${PlatformName}-internal-sg
-      GroupDescription: !Sub Allows internal traffic between ${PlatformName} resources.
+          Value: !Sub ${OrganizationName}-internal-sg
+      GroupName: !Sub ${OrganizationName}-internal-sg
+      GroupDescription: !Sub Allows internal traffic between ${OrganizationName} resources.
       VpcId: !Ref Vpc
 
   SecurityGroupIngress:
@@ -40,9 +40,9 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-public-sg
-      GroupName: !Sub ${PlatformName}-public-sg
-      GroupDescription: !Sub Allows public traffic for ${PlatformName}.
+          Value: !Sub ${OrganizationName}-public-sg
+      GroupName: !Sub ${OrganizationName}-public-sg
+      GroupDescription: !Sub Allows public traffic for ${OrganizationName}.
       VpcId: !Ref Vpc
 
   SecurityGroupPublicIngress:
@@ -56,12 +56,12 @@ Outputs:
   VpcId:
     Value: !Ref Vpc
     Export:
-      Name: !Sub ${PlatformName}:VpcId
+      Name: !Sub ${OrganizationName}:VpcId
 
   SecurityGroup:
     Value: !Ref SecurityGroup
     Export:
-      Name: !Sub ${PlatformName}:SecurityGroup
+      Name: !Sub ${OrganizationName}:SecurityGroup
 
   SecurityGroupPublic:
     Value: !Ref SecurityGroupPublic

@@ -1,5 +1,5 @@
 {
-  "PlatformName": "panicboat",
+  "OrganizationName": "panicboat",
   "DomainName": "dev.panicboat.net",
   "HostedZoneId": "",
   "PrivateCidrA": "172.31.160.0/20",

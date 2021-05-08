@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
   DomainName:
     Type: String
@@ -35,4 +35,4 @@ Outputs:
   CertificateArn:
     Value: !Ref Certificate
     Export:
-      Name: !Sub ${PlatformName}:CertificateArn
+      Name: !Sub ${OrganizationName}:CertificateArn

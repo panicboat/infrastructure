@@ -1,5 +1,5 @@
 {
-    "PlatformName": "panicboat",
+    "OrganizationName": "panicboat",
     "ProductName": "platform",
     "ProjectName": "api-iam",
     "BuildDirectory": ".",

@@ -65,7 +65,7 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           SecurityGroups:
-            - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+            - { 'Fn::ImportValue': !Sub "${OrganizationName}:SecurityGroup" }
           Subnets: !Ref ProtectSubnets
       ServiceName: !Ref ProjectName
       TaskDefinition: !Ref TaskDefinitionArn

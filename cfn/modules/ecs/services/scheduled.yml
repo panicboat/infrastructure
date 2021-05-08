@@ -33,7 +33,7 @@ Resources:
               AwsVpcConfiguration:
                 AssignPublicIp: DISABLED
                 SecurityGroups:
-                  - { 'Fn::ImportValue': !Sub "${PlatformName}:SecurityGroup" }
+                  - { 'Fn::ImportValue': !Sub "${OrganizationName}:SecurityGroup" }
                 Subnets: !Ref ProtectSubnets
           Input: !Join [
             '',

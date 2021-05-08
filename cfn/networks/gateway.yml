@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
   PublicSubnetA:
     Type: AWS::EC2::Subnet::Id
@@ -21,7 +21,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-igw
+          Value: !Sub ${OrganizationName}-igw
 
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -39,7 +39,7 @@ Resources:
       SubnetId: !Ref PublicSubnetA
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-ngw-a
+          Value: !Sub ${OrganizationName}-ngw-a
 
   EipA:
     Type: AWS::EC2::EIP
@@ -53,7 +53,7 @@ Resources:
       SubnetId: !Ref PublicSubnetC
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-ngw-c
+          Value: !Sub ${OrganizationName}-ngw-c
 
   EipC:
     Type: AWS::EC2::EIP
@@ -67,7 +67,7 @@ Resources:
       SubnetId: !Ref PublicSubnetD
       Tags:
         - Key: Name
-          Value: !Sub ${PlatformName}-ngw-d
+          Value: !Sub ${OrganizationName}-ngw-d
 
   EipD:
     Type: AWS::EC2::EIP

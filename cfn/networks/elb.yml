@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
   CertificateArn:
     Type: String
@@ -29,7 +29,7 @@ Resources:
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub ${PlatformName}-alb
+      Name: !Sub ${OrganizationName}-alb
       Scheme: internet-facing
       Subnets: !Ref PublicSubnets
       Type: application
@@ -72,9 +72,9 @@ Outputs:
   HttpListenerArn:
     Value: !Ref HttpListener
     Export:
-      Name: !Sub ${PlatformName}:HttpListenerArn
+      Name: !Sub ${OrganizationName}:HttpListenerArn
 
   HttpsListenerArn:
     Value: !Ref HttpsListener
     Export:
-      Name: !Sub ${PlatformName}:HttpsListenerArn
+      Name: !Sub ${OrganizationName}:HttpsListenerArn

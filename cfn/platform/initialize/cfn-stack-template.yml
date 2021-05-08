@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
   ProductName:
     Type: String
@@ -20,7 +20,7 @@ Resources:
       Parameters:
         ProductName: !Ref ProductName
         CallbackURLs: !Ref CallbackURLs
-        CertificateArn: { 'Fn::ImportValue': !Sub "${PlatformName}:CertificateArn" }
+        CertificateArn: { 'Fn::ImportValue': !Sub "${OrganizationName}:CertificateArn" }
         DomainName: !Ref DomainName
 
   Vpc:
@@ -29,7 +29,7 @@ Resources:
       TemplateURL: ./vpc.yml
       Parameters:
         ProductName: !Ref ProductName
-        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
+        VpcId: { 'Fn::ImportValue': !Sub "${OrganizationName}:VpcId" }
 
   Ecs:
     Type: AWS::CloudFormation::Stack
@@ -38,7 +38,7 @@ Resources:
       Parameters:
         ProductName: !Ref ProductName
         PrivateNamespace: !Ref PrivateNamespace
-        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
+        VpcId: { 'Fn::ImportValue': !Sub "${OrganizationName}:VpcId" }
 
   AuroraServerless:
     Type: AWS::CloudFormation::Stack
@@ -46,6 +46,6 @@ Resources:
       TemplateURL: ./rds.yml
       Parameters:
         ProductName: !Ref ProductName
-        MasterUsername: !Ref PlatformName
-        PrivateSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:PrivateSubnetD"}]]
+        MasterUsername: !Ref OrganizationName
+        PrivateSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:PrivateSubnetA"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:PrivateSubnetC"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:PrivateSubnetD"}]]
         SecurityGroups: !Join [',', [!GetAtt [Vpc, Outputs.SecurityGroup]]]

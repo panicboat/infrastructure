@@ -2,7 +2,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
 
 Resources:
@@ -21,12 +21,12 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
-      RoleName: !Sub ${PlatformName}-ec2-role-for-ssm
+      RoleName: !Sub ${OrganizationName}-ec2-role-for-ssm
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: !Sub ${PlatformName}-ec2-profile-for-ssm
+      InstanceProfileName: !Sub ${OrganizationName}-ec2-profile-for-ssm
       Roles:
         - !Ref EC2RoleforSSM
 
@@ -44,10 +44,10 @@ Resources:
               - sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
-      RoleName: !Sub ${PlatformName}-chatbot-role
+      RoleName: !Sub ${OrganizationName}-chatbot-role
 
 Outputs:
   ChatbotRoleArn:
     Value: !GetAtt ChatbotRole.Arn
     Export:
-      Name: !Sub ${PlatformName}:ChatbotRoleArn
+      Name: !Sub ${OrganizationName}:ChatbotRoleArn

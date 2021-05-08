@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
   DomainName:
     Type: String
@@ -34,7 +34,7 @@ Resources:
     Properties:
       TemplateURL: ./certificate.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        OrganizationName: !Ref OrganizationName
         DomainName: !Ref DomainName
         HostedZoneId: !Ref HostedZoneId
 
@@ -43,14 +43,14 @@ Resources:
     Properties:
       TemplateURL: iam.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        OrganizationName: !Ref OrganizationName
 
   Vpc:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./vpc.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        OrganizationName: !Ref OrganizationName
         VpcCidrBlock: !Ref VpcCidrBlock
 
   Subnet:
@@ -58,7 +58,7 @@ Resources:
     Properties:
       TemplateURL: ./subnet.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        OrganizationName: !Ref OrganizationName
         PrivateCidrA: !Ref PrivateCidrA
         PrivateCidrC: !Ref PrivateCidrC
         PrivateCidrD: !Ref PrivateCidrD
@@ -75,7 +75,7 @@ Resources:
     Properties:
       TemplateURL: ./gateway.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        OrganizationName: !Ref OrganizationName
         PublicSubnetA: !GetAtt [Subnet, Outputs.PublicSubnetA]
         PublicSubnetC: !GetAtt [Subnet, Outputs.PublicSubnetC]
         PublicSubnetD: !GetAtt [Subnet, Outputs.PublicSubnetD]
@@ -86,7 +86,7 @@ Resources:
     Properties:
       TemplateURL: ./route.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        OrganizationName: !Ref OrganizationName
         GatewayId: !GetAtt [Gateway, Outputs.InternetGateway]
         NatGatewayA: !GetAtt [Gateway, Outputs.NatGatewayA]
         NatGatewayC: !GetAtt [Gateway, Outputs.NatGatewayC]
@@ -107,7 +107,7 @@ Resources:
     Properties:
       TemplateURL: ./elb.yml
       Parameters:
-        PlatformName: !Ref PlatformName
+        OrganizationName: !Ref OrganizationName
         CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
         DomainName: !Ref DomainName
         HostedZoneId: !Ref HostedZoneId

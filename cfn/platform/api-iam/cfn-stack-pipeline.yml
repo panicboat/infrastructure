@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  PlatformName:
+  OrganizationName:
     Type: String
   ProductName:
     Type: String
@@ -55,7 +55,7 @@ Resources:
       TemplateURL: ../../modules/pipeline/foundations.yml
       Parameters:
         ProjectName: !Ref ProjectName
-        IamRoleArn: { 'Fn::ImportValue': !Sub "${PlatformName}:ChatbotRoleArn" }
+        IamRoleArn: { 'Fn::ImportValue': !Sub "${OrganizationName}:ChatbotRoleArn" }
         SlackChannelId: !Ref SlackChannelId
         SlackWorkspaceId: !Ref SlackWorkspaceId
 
@@ -76,11 +76,11 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubOwner: !Ref GitHubOwner
         GitHubRepository: !Ref GitHubRepository
-        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
+        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetD"}]]
         ReleaseID: !Ref ReleaseID
         ReleaseVersion: !Ref ReleaseVersion
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
-        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
+        VpcId: { 'Fn::ImportValue': !Sub "${OrganizationName}:VpcId" }
 
   CodePipeline:
     Type: AWS::CloudFormation::Stack
@@ -89,7 +89,7 @@ Resources:
       TemplateURL: ../../modules/pipeline/dev/codepipeline.yml
       Parameters:
         ProjectName: !Ref ProjectName
-        ArtifactBucket: { 'Fn::ImportValue': !Sub "${PlatformName}:ArtifactBucket" }
+        ArtifactBucket: { 'Fn::ImportValue': !Sub "${OrganizationName}:ArtifactBucket" }
         BuildProject: !GetAtt [CodeBuild, Outputs.DockerBuild]
         CICredentialArn: !Ref CICredentialArn
         ClusterName: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterName" }
@@ -116,10 +116,10 @@ Resources:
         ContainerName: !Ref ContainerName
         GitHubOwner: !Ref GitHubOwner
         GitHubRepository: !Ref GitHubRepository
-        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${PlatformName}:ProtectSubnetD"}]]
+        ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetD"}]]
         ReleaseVersion: !Ref ReleaseVersion
         SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
-        VpcId: { 'Fn::ImportValue': !Sub "${PlatformName}:VpcId" }
+        VpcId: { 'Fn::ImportValue': !Sub "${OrganizationName}:VpcId" }
 
   CodePipeline:
     Type: AWS::CloudFormation::Stack
@@ -128,7 +128,7 @@ Resources:
       TemplateURL: ../../modules/pipeline/prd/codepipeline.yml
       Parameters:
         ProjectName: !Ref ProjectName
-        ArtifactBucket: { 'Fn::ImportValue': !Sub "${PlatformName}:ArtifactBucket" }
+        ArtifactBucket: { 'Fn::ImportValue': !Sub "${OrganizationName}:ArtifactBucket" }
         BuildProject: !GetAtt [CodeBuild, Outputs.DockerBuild]
         CodePipelineRoleArn: !GetAtt [IamRoles, Outputs.CodePipelineRoleArn]
         ClusterName: { 'Fn::ImportValue': !Sub "${ProductName}:ClusterName" }

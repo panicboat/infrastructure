@@ -32,12 +32,12 @@ fi
 # Parameters
 # ------------------------------------------------------------------------------------------------------
 params=`cat $SCRIPT_DIR/$env/params.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
-platform=`cat $SCRIPT_DIR/$env/params.json | jq -r '.PlatformName'`
+organization=`cat $SCRIPT_DIR/$env/params.json | jq -r '.OrganizationName'`
 
 # ------------------------------------------------------------------------------------------------------
 # Package
 # ------------------------------------------------------------------------------------------------------
-artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$platform':ArtifactBucket")) | .Value'`
+artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$organization':ArtifactBucket")) | .Value'`
 aws cloudformation package \
     --template-file $SCRIPT_DIR/cfn-stack-template.yml \
     --s3-bucket $artifact_bucket \
@@ -52,7 +52,7 @@ fi
 # ------------------------------------------------------------------------------------------------------
 aws cloudformation deploy \
     --template-file $SCRIPT_DIR/$env/.cfn-stack-template.yml \
-    --stack-name $platform-networks \
+    --stack-name $organization-networks \
     --parameter-overrides $params Environment=$env \
     --capabilities CAPABILITY_NAMED_IAM
 if [ $? -ne 0 ]; then
