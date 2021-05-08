@@ -27,6 +27,7 @@ Resources:
           - admin@panicboat.net
           - info@panicboat.net
           - no-reply@panicboat.net
+          - platform@panicboat.net
       RuleSetName: !Ref ReceiptRuleSet
 
   # ------------------------------------------------
