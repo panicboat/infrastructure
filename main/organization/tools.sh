@@ -1,5 +1,11 @@
 #!/bin/bash -eu
-SCRIPT_DIR=$(cd $(dirname $0); pwd)/../cfn/tools
+SCRIPT_DIR=$(cd $(dirname $0); pwd)/../../cfn/organization/tools
+
+# ------------------------------------------------------------------------------------------------------
+# Parameters
+# ------------------------------------------------------------------------------------------------------
+params=`cat $SCRIPT_DIR/params.json | jq -r '. | to_entries | map("\(.key)=\(.value|tostring)") | .[]' | tr '\n' ' ' | awk '{print}'`
+organization=`cat $SCRIPT_DIR/params.json | jq -r '.OrganizationName'`
 
 # ------------------------------------------------------------------------------------------------------
 # Package

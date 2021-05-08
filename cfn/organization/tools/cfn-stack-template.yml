@@ -1,5 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 
+Parameters:
+  OrganizationName:
+    Type: String
+
 Resources:
   MailForwarder:
     Type: AWS::CloudFormation::Stack

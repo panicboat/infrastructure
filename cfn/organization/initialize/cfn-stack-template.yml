@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  OrganizationName:
+    Type: String
+
+Resources:
+  Route53:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./route53.yml
