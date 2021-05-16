@@ -1,3 +1,5 @@
 {
-  "OrganizationName": "panicboat"
+  "OrganizationName": "panicboat",
+  "DomainName": "panicboat.net",
+  "HostedZoneId": "Z02175842S00OVKBT3L0A"
 }

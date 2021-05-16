@@ -3,9 +3,22 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   OrganizationName:
     Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
 
 Resources:
   Route53:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./route53.yml
+
+  Certificates:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./certificate.yml
+      Parameters:
+        OrganizationName: !Ref OrganizationName
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId

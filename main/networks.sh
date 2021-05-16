@@ -25,7 +25,7 @@ done
 
 if [ -z "$product" ] || [ ! -d "$CFN_HOME/$product" ]; then
     while true; do
-        read -p 'What product do you deploy to? ( platform ) : ' product
+        read -p 'What product do you deploy to? : ' product
         if [ -n "$product" ] && [ -d "$CFN_HOME/$product" ]; then
             break
         fi

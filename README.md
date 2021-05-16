@@ -36,14 +36,14 @@ read -p 'input service name : ' SERVICE   # service or pipeline
 sh main/artifacts.sh
 ```
 
-2. Deploy network resources.
-```bash
-sh main/networks.sh -e $ENV
-```
-
 ## Product initialize
 
-1. Deploy product initialize
+1. Deploy network resources.
+```bash
+sh main/networks.sh -e $ENV --product $PRODUCT
+```
+
+2. Deploy product initialize
 ```bash
 sh main/$PRODUCT/initialize.sh -e $ENV
 ```
