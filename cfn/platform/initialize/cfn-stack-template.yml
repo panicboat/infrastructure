@@ -13,6 +13,13 @@ Parameters:
     Type: String
 
 Resources:
+  Certificates:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./certificate.yml
+      Parameters:
+        DomainName: !Ref DomainName
+
   Cognito:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -20,7 +27,7 @@ Resources:
       Parameters:
         ProductName: !Ref ProductName
         CallbackURLs: !Ref CallbackURLs
-        CertificateArn: { 'Fn::ImportValue': !Sub "${OrganizationName}:CertificateArn" }
+        CertificateArn: !GetAtt [Certificates, Outputs.CertificateArn]
         DomainName: !Ref DomainName
 
   SecurityGroups:
@@ -48,4 +55,4 @@ Resources:
         ProductName: !Ref ProductName
         MasterUsername: !Ref OrganizationName
         PrivateSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:PrivateSubnetA"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:PrivateSubnetC"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:PrivateSubnetD"}]]
-        SecurityGroups: !Join [',', [!GetAtt [Vpc, Outputs.SecurityGroup]]]
+        SecurityGroups: !Join [',', [!GetAtt [SecurityGroups, Outputs.SecurityGroup]]]
