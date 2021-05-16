@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-SCRIPT_DIR=$(cd $(dirname $0); pwd)/../cfn/modules/networks
+CFN_HOME=$(cd $(dirname $0); pwd)/../cfn
 
 # ------------------------------------------------------------------------------------------------------
 # Input Option
@@ -11,6 +11,10 @@ do
             env=${2}
             shift
         ;;
+        --product|-p)
+            product=${2}
+            shift
+        ;;
         *)
             echo "[ERROR] Invalid option '${1}'"
             exit 1
@@ -19,15 +23,25 @@ do
     shift
 done
 
-if [ -z "$env" ] || [ ! -d "$SCRIPT_DIR/$env" ]; then
+if [ -z "$product" ] || [ ! -d "$CFN_HOME/$product" ]; then
     while true; do
-        read -p 'What environment do you deploy to? ( dev / prd ) : ' env
-        if [ -n "$env" ] && [ -d "$SCRIPT_DIR/$env" ]; then
+        read -p 'What product do you deploy to? ( platform ) : ' product
+        if [ -n "$product" ] && [ -d "$CFN_HOME/$product" ]; then
             break
         fi
     done
 fi
 
+if [ -z "$env" ] || [ ! -d "$CFN_HOME/$product/networks/$env" ]; then
+    while true; do
+        read -p 'What environment do you deploy to? ( dev / prd ) : ' env
+        if [ -n "$env" ] && [ -d "$CFN_HOME/$product/networks/$env" ]; then
+            break
+        fi
+    done
+fi
+
+SCRIPT_DIR=$CFN_HOME/$product/networks
 # ------------------------------------------------------------------------------------------------------
 # Parameters
 # ------------------------------------------------------------------------------------------------------
@@ -39,7 +53,7 @@ organization=`cat $SCRIPT_DIR/$env/params.json | jq -r '.OrganizationName'`
 # ------------------------------------------------------------------------------------------------------
 artifact_bucket=`aws cloudformation list-exports | jq -r '.Exports[]' | jq -r 'select(.Name | test("'$organization':ArtifactBucket")) | .Value'`
 aws cloudformation package \
-    --template-file $SCRIPT_DIR/cfn-stack-template.yml \
+    --template-file $CFN_HOME/modules/networks/cfn-stack-template.yml \
     --s3-bucket $artifact_bucket \
     --s3-prefix cloudformation/networks \
     --output-template-file $SCRIPT_DIR/$env/.cfn-stack-template.yml

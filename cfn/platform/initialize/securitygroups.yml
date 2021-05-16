@@ -12,8 +12,8 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${ProductName}-sg
-      GroupName: !Sub ${ProductName}-sg
+          Value: !Ref ProductName
+      GroupName: !Ref ProductName
       GroupDescription: !Sub Allows traffic between ${ProductName} resources.
       VpcId: !Ref VpcId
 

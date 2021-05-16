@@ -11,8 +11,6 @@ Parameters:
     Type: String
   PublicSubnets:
     Type: List<AWS::EC2::Subnet::Id>
-  SecurityGroups:
-    Type: List<AWS::EC2::SecurityGroup::Id>
 
 Resources:
   RecordSet:
@@ -33,7 +31,8 @@ Resources:
       Scheme: internet-facing
       Subnets: !Ref PublicSubnets
       Type: application
-      SecurityGroups: !Ref SecurityGroups
+      SecurityGroups:
+        - !Ref SecurityGroup
       LoadBalancerAttributes:
         - Key: idle_timeout.timeout_seconds
           Value: 300
@@ -67,6 +66,23 @@ Resources:
       Protocol: HTTPS
       Certificates:
         - CertificateArn: !Ref CertificateArn
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${OrganizationName}-public-sg
+      GroupName: !Sub ${OrganizationName}-public-sg
+      GroupDescription: !Sub Allows public traffic for ${OrganizationName}.
+      VpcId: !Ref Vpc
+
+  SecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroup
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
 
 Outputs:
   HttpListenerArn:

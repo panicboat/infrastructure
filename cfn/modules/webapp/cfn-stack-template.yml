@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  OrganizationName:
+    Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  PrivateCidrA:
+    Type: String
+  PrivateCidrC:
+    Type: String
+  PrivateCidrD:
+    Type: String
+  ProtectCidrA:
+    Type: String
+  ProtectCidrC:
+    Type: String
+  ProtectCidrD:
+    Type: String
+  PublicCidrA:
+    Type: String
+  PublicCidrC:
+    Type: String
+  PublicCidrD:
+    Type: String
+  VpcCidrBlock:
+    Type: String
+
+Resources:
+  Certificate:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./certificate.yml
+      Parameters:
+        OrganizationName: !Ref OrganizationName
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+
+  ElasticLoadBalancer:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./elb.yml
+      Parameters:
+        OrganizationName: !Ref OrganizationName
+        CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
+        DomainName: !Ref DomainName
+        HostedZoneId: !Ref HostedZoneId
+        PublicSubnets:
+          - { 'Fn::ImportValue': !Sub "${OrganizationName}:PublicSubnetA" }
+          - { 'Fn::ImportValue': !Sub "${OrganizationName}:PublicSubnetC" }
+          - { 'Fn::ImportValue': !Sub "${OrganizationName}:PublicSubnetD" }
+        SecurityGroups:
+          - { 'Fn::ImportValue': !Sub "${OrganizationName}:SecurityGroupPublic" }
+          - { 'Fn::ImportValue': !Sub "${OrganizationName}:SecurityGroup" }

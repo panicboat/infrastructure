@@ -3,10 +3,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   OrganizationName:
     Type: String
-  DomainName:
-    Type: String
-  HostedZoneId:
-    Type: String
   PrivateCidrA:
     Type: String
   PrivateCidrC:
@@ -29,19 +25,10 @@ Parameters:
     Type: String
 
 Resources:
-  Certificate:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./certificate.yml
-      Parameters:
-        OrganizationName: !Ref OrganizationName
-        DomainName: !Ref DomainName
-        HostedZoneId: !Ref HostedZoneId
-
   IAM:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: iam.yml
+      TemplateURL: ./iam.yml
       Parameters:
         OrganizationName: !Ref OrganizationName
 
@@ -101,17 +88,3 @@ Resources:
         PublicSubnetC: !GetAtt [Subnet, Outputs.PublicSubnetC]
         PublicSubnetD: !GetAtt [Subnet, Outputs.PublicSubnetD]
         VpcId: !GetAtt [Vpc, Outputs.VpcId]
-
-  ElasticLoadBalancer:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./elb.yml
-      Parameters:
-        OrganizationName: !Ref OrganizationName
-        CertificateArn: !GetAtt [Certificate, Outputs.CertificateArn]
-        DomainName: !Ref DomainName
-        HostedZoneId: !Ref HostedZoneId
-        PublicSubnets: !Join [',', [!GetAtt [Subnet, Outputs.PublicSubnetA], !GetAtt [Subnet, Outputs.PublicSubnetC], !GetAtt [Subnet, Outputs.PublicSubnetD]]]
-        SecurityGroups: !Join [',', [!GetAtt [Vpc, Outputs.SecurityGroupPublic], !GetAtt [Vpc, Outputs.SecurityGroup]]]
-    DependsOn:
-      - Gateway

@@ -23,10 +23,10 @@ Resources:
         CertificateArn: { 'Fn::ImportValue': !Sub "${OrganizationName}:CertificateArn" }
         DomainName: !Ref DomainName
 
-  Vpc:
+  SecurityGroups:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./vpc.yml
+      TemplateURL: ./security-groups.yml
       Parameters:
         ProductName: !Ref ProductName
         VpcId: { 'Fn::ImportValue': !Sub "${OrganizationName}:VpcId" }

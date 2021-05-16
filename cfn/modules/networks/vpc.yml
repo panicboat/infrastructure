@@ -18,50 +18,8 @@ Resources:
         - Key: Name
           Value: !Ref OrganizationName
 
-  SecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      Tags:
-        - Key: Name
-          Value: !Sub ${OrganizationName}-internal-sg
-      GroupName: !Sub ${OrganizationName}-internal-sg
-      GroupDescription: !Sub Allows internal traffic between ${OrganizationName} resources.
-      VpcId: !Ref Vpc
-
-  SecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroup
-      IpProtocol: -1
-      SourceSecurityGroupId: !Ref SecurityGroup
-
-  SecurityGroupPublic:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      Tags:
-        - Key: Name
-          Value: !Sub ${OrganizationName}-public-sg
-      GroupName: !Sub ${OrganizationName}-public-sg
-      GroupDescription: !Sub Allows public traffic for ${OrganizationName}.
-      VpcId: !Ref Vpc
-
-  SecurityGroupPublicIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroupPublic
-      IpProtocol: -1
-      CidrIp: 0.0.0.0/0
-
 Outputs:
   VpcId:
     Value: !Ref Vpc
     Export:
       Name: !Sub ${OrganizationName}:VpcId
-
-  SecurityGroup:
-    Value: !Ref SecurityGroup
-    Export:
-      Name: !Sub ${OrganizationName}:SecurityGroup
-
-  SecurityGroupPublic:
-    Value: !Ref SecurityGroupPublic
