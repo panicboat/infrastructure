@@ -73,7 +73,7 @@ Resources:
         DesiredCount: !Ref DesiredCount
         NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
         ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetD"}]]
-        SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:SecurityGroup" }, { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
+        SecurityGroups: { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }
         TaskDefinitionArn: !GetAtt [TaskDefinitions, Outputs.TaskDefinitionArn]
 
   VirtualGateway:
@@ -106,5 +106,5 @@ Resources:
         DesiredCount: 1
         NamespaceId: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceDiscoveryId" }
         ProtectSubnets: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetA"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetC"}, { 'Fn::ImportValue': !Sub "${OrganizationName}:ProtectSubnetD"}]]
-        SecurityGroups: !Join [',', [{ 'Fn::ImportValue': !Sub "${OrganizationName}:SecurityGroup" }, { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }]]
+        SecurityGroups: { 'Fn::ImportValue': !Sub "${ProductName}:SecurityGroup" }
         TaskDefinitionArn: !GetAtt [GatewayDefinitions, Outputs.TaskDefinitionArn]
