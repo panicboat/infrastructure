@@ -7,8 +7,6 @@ Parameters:
     Type: String
   DesiredCount:
     Type: Number
-  NamespaceId:
-    Type: String
   ProtectSubnets:
     Type: List<AWS::EC2::Subnet::Id>
   SecurityGroups:

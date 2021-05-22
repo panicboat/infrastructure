@@ -41,7 +41,7 @@ Resources:
   Ecs:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs.yml
+      TemplateURL: ../../modules/ecs/cluster.yml
       Parameters:
         ProductName: !Ref ProductName
         PrivateNamespace: !Ref PrivateNamespace
