@@ -29,17 +29,17 @@ Resources:
         ProjectName: !Ref ProjectName
         AllowEcsPolicy: !Join [',', !Ref AllowEcsPolicy]
 
-  Foundations:
+  Repository:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs/foundations.yml
+      TemplateURL: ../../modules/ecs/repository.yml
       Parameters:
         ProjectName: !Ref ProjectName
 
   AppMesh:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ../../modules/ecs/mesh.yml
+      TemplateURL: ../../modules/mesh/virtual-services.yml
       Parameters:
         ProjectName: !Ref ProjectName
         ContainerPort: !Ref ContainerPort
@@ -56,8 +56,8 @@ Resources:
         ContainerPort: !Ref ContainerPort
         EcsTaskExecutionRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskExecutionRole]
         EcsTaskRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskRoleArn]
-        LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
-        RepositoryURI: !GetAtt [Foundations, Outputs.RepositoryURI]
+        LogGroup: !GetAtt [Repository, Outputs.LogGroup]
+        RepositoryURI: !GetAtt [Repository, Outputs.RepositoryURI]
         TaskCpu: !Ref TaskCpu
         TaskMemory: !Ref TaskMemory
         VirtualNodeName: !GetAtt [AppMesh, Outputs.VirtualNodeName]
@@ -92,7 +92,7 @@ Resources:
         ProjectName: !Sub ${ProjectName}-gw
         EcsTaskExecutionRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskExecutionRole]
         EcsTaskRoleArn: !GetAtt [IamRoles, Outputs.EcsTaskRoleArn]
-        LogGroup: !GetAtt [Foundations, Outputs.LogGroup]
+        LogGroup: !GetAtt [Repository, Outputs.LogGroup]
         MeshName: { 'Fn::ImportValue': !Sub "${ProductName}:ServiceMesh" }
 
   GatewayService:
