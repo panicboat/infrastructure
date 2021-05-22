@@ -3,6 +3,10 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   ProjectName:
     Type: String
+  ClusterArn:
+    Type: String
+  DesiredCount:
+    Type: Number
   EcsTaskExecutionRoleArn:
     Type: String
   EcsTaskRoleArn:
@@ -11,8 +15,42 @@ Parameters:
     Type: String
   MeshName:
     Type: String
+  NamespaceId:
+    Type: String
+  ProtectSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  SecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  VirtualServiceName:
+    Type: String
 
 Resources:
+  VirtualGateway:
+    Type: AWS::AppMesh::VirtualGateway
+    Properties:
+      MeshName: !Ref MeshName
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 9080
+              Protocol: http
+      VirtualGatewayName: !Ref ProjectName
+
+  GatewayRoute:
+    Type: AWS::AppMesh::GatewayRoute
+    Properties:
+      GatewayRouteName: !Ref ProjectName
+      MeshName: !Ref MeshName
+      Spec:
+        HttpRoute:
+          Action:
+            Target:
+              VirtualService:
+                VirtualServiceName: !Ref VirtualServiceName
+          Match:
+            Prefix: /
+      VirtualGatewayName: !GetAtt VirtualGateway.VirtualGatewayName
+
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -75,6 +113,34 @@ Resources:
               awslogs-stream-prefix: gw-xray
           Essential: true
 
-Outputs:
-  TaskDefinitionArn:
-    Value: !Ref TaskDefinition
+  GatewayService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ClusterArn
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      ServiceRegistries:
+        - RegistryArn: !GetAtt ServiceDiscovery.Arn
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED   # TODO: Set to DISABLED when using NAT Gateway
+          SecurityGroups: !Ref SecurityGroups
+          Subnets: !Ref ProtectSubnets
+      ServiceName: !Ref ProjectName
+      TaskDefinition: !Ref TaskDefinition
+      # LoadBalancers:
+      #   - ContainerName: envoy
+      #     ContainerPort: 9080
+      #     TargetGroupArn: !Ref WebTargetGroup
+
+  ServiceDiscovery:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: !Ref ProjectName
+      DnsConfig:
+        NamespaceId: !Ref NamespaceId
+        DnsRecords:
+          - Type: A
+            TTL: 300
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
